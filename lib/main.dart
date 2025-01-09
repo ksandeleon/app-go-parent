@@ -39,6 +39,8 @@ void main() async {
   print("Database initialized");
   print("Database initialized");
   print("Database initialized");
+   print("Database initialized");
+
 
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.black));

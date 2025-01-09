@@ -183,14 +183,4 @@ Future<void> dropTable(String tableName) async {
     print("Error dropping table '$tableName': $e");
     }
   }
-
-  Future<List<Map<String, dynamic>>> getUserBabies(int userId) async {
-    final db = await database;
-    return await db.query('babydb', where: 'userId = ?', whereArgs: [userId]);
-  }
-
-  Future<List<Map<String, dynamic>>> getMissionsForAge(int minAge, int maxAge) async {
-    final db = await database;
-    return await db.query('missionsdb', where: 'minAge <= ? AND maxAge >= ?', whereArgs: [minAge, maxAge]);
-  }
 }
