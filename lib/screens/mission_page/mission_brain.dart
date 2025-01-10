@@ -2,7 +2,6 @@ import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
-import 'package:go_parent/utilities/user_session.dart';
 
 class MissionBrain {
   final MissionHelper missionHelper;
@@ -25,6 +24,19 @@ class MissionBrain {
     }
   }
 
+  Future<void> getMissionsByAge(int babyAge) async {
+
+    try {
+      _missions =  await missionHelper.getMissionsByBabyMonthAge(babyAge);
+    }
+    catch (e) {
+      print('Error loading missions by age: $e');
+      _missions = [];
+    }
+  }
+
+
+
   Future<List<MissionModel>> getMissionsByCategory(String category) async {
     try {
       return await missionHelper.getMissionsByCategory(category);
@@ -33,8 +45,6 @@ class MissionBrain {
       return [];
     }
   }
-
-
 
 
   // Retrieve all babies linked to the logged-in user

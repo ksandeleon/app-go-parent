@@ -25,21 +25,9 @@ class _MissionScreenState extends State<MissionScreen> {
   double progress = 0;
   int totalPoints = 0;
 
-  Map<String, dynamic>? _selectedBaby;
-
-
   List<DropdownMenuEntry<int>> dropdownItems = [];
   int? _selectedBabyAge;
-
-
-
-
-
-
-
-
-
-
+  List<MissionModel> _missions = [];
   late MissionBrain _missionBrain;
   bool _isLoading = true;
 
@@ -47,42 +35,8 @@ class _MissionScreenState extends State<MissionScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeMissionBrain().then((_) {
-      _fetchBabiesAndSetupDropdown();
-    });
+    _initializeMissionBrain();
   }
-
-  Future<void> _fetchBabiesAndSetupDropdown() async {
-
-    List<BabyModel> babies = await _missionBrain.getBabiesForUser();
-
-    if (babies.isEmpty) {
-      print("No babies found for user");
-      setState(() {
-        dropdownItems = [];
-      });
-      return;
-    }
-
-    setState(() {
-      dropdownItems = babies
-          .map((baby) => DropdownMenuEntry<int>(
-                value: baby.babyAge,
-                label: baby.babyName,
-              ))
-          .toList();
-    });
-  }
-
-
-
-
-
-
-
-
-
-
 
   Future<void> _initializeMissionBrain() async {
     // Initialize database
@@ -90,12 +44,84 @@ class _MissionScreenState extends State<MissionScreen> {
     final missionHelper = MissionHelper(db);
     final babyHelper = BabyHelper(db);
 
-    // Create MissionBrain
     _missionBrain = MissionBrain(missionHelper, babyHelper);
 
-    // Load missions
     await _loadMissions();
+    await  _fetchBabiesAndSetupDropdown();
   }
+
+
+  // Future<void> _fetchBabiesAndSetupDropdown() async {
+  //   List<BabyModel> babies = await _missionBrain.getBabiesForUser();
+
+  //   if (babies.isEmpty) {
+  //     print("No babies found for user");
+  //     setState(() {
+  //       dropdownItems = [];
+  //     });
+  //     return;
+  //   }
+
+  //   setState(() {
+  //     dropdownItems = babies
+  //         .map((baby) => DropdownMenuEntry<int>(
+  //               value: baby.babyAge,
+  //               label: baby.babyName,
+  //             ))
+  //         .toList();
+  //   });
+  // }
+
+
+  Future<void> _fetchBabiesAndSetupDropdown() async {
+    setState(() => _isLoading = true);
+    try {
+      List<BabyModel> babies = await _missionBrain.getBabiesForUser();
+      if (babies.isEmpty) {
+        print("No babies found for user");
+        setState(() {
+          dropdownItems = [];
+          _isLoading = false;
+        });
+        return;
+      }
+
+      setState(() {
+        dropdownItems = babies
+            .map((baby) => DropdownMenuEntry<int>(
+                  value: baby.babyAge,
+                  label: baby.babyName,
+                ))
+            .toList();
+        // Set initial selected age
+        _selectedBabyAge = babies.first.babyAge;
+      });
+
+      // Fetch initial missions
+      await _fetchMissions();
+    } catch (e) {
+      print('Error setting up dropdown: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Future<void> _fetchMissions() async {
+    if (_selectedBabyAge == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      await _missionBrain.getMissionsByAge(_selectedBabyAge!);
+      setState(() {
+        _missions = _missionBrain.missions;  // Assuming you have a getter for missions
+      });
+    } catch (e) {
+      print('Error fetching missions: $e');
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
 
   Future<void> _loadMissions() async {
     setState(() {
@@ -115,24 +141,16 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
 
+  // Future<void> _loadMissionsForSelectedBaby() async {
+  //   if (_selectedBaby != null) {
+  //     int babyAge = _selectedBaby!['babyAge'];
+  //     _missions = await missionBrain.getMissionsByBabyMonthAge(babyAge, babyAge);
+  //     _missionCompleted = List.generate(_missions.length, (index) => _missions[index]['isCompleted']);
+  //     setState(() {});
+  //   }
+  // }
 
 
-
-
-
-//   Future<void> _loadMissionsForSelectedBaby() async {
-//     if (_selectedBaby != null) {
-//       int babyAge = _selectedBaby!['babyAge'];
-//       _missions = await missionBrain.getMissionsByBabyMonthAge(babyAge, babyAge);
-//       _missionCompleted = List.generate(_missions.length, (index) => _missions[index]['isCompleted']);
-//       setState(() {});
-//     }
-//   }
-
-
-///
-///
-//
 
   // Future<void> _pickImageForMission(int missionIndex) async {
   //   final picker = ImagePicker();
@@ -155,22 +173,18 @@ class _MissionScreenState extends State<MissionScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        DropdownMenu<int>(
-           dropdownMenuEntries:dropdownItems,
-           onSelected: (int? age){
-            setState(() {
-              _selectedBabyAge = age;
-            });
-           },
-           ),
 
-
-
-
-
-
-
-
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: DropdownMenu<int>(
+                  dropdownMenuEntries: dropdownItems,
+                  initialSelection: _selectedBabyAge,
+                  onSelected: (int? age) async {
+                    setState(() => _selectedBabyAge = age);
+                    await _fetchMissions();
+                  },
+                ),
+              ),
 
 
         Text("data"),
@@ -195,7 +209,9 @@ class _MissionScreenState extends State<MissionScreen> {
                     children: [
                       Column(
                         children: [
-                          MissionList(missions: _missionBrain.missions),
+                          _missions.isEmpty
+                              ? const Center(child: Text('No missions available'))
+                              : MissionList(missions: _missions),
                         ],
                       ),
                     ],
@@ -203,21 +219,11 @@ class _MissionScreenState extends State<MissionScreen> {
             ),
           ),
 
-
-
-
         ),
       ],
     );
   }
 }
-
-
-
-
-
-
-
 
 
 class MissionList extends StatelessWidget {
