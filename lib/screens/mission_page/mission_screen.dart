@@ -1,5 +1,4 @@
 import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:go_parent/Screen/prototypeMissionGraph.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
@@ -27,14 +26,10 @@ class _MissionScreenState extends State<MissionScreen> {
   int totalPoints = 0;
 
   Map<String, dynamic>? _selectedBaby;
-  // List<Map<String, dynamic>> _missions = [];
 
 
-
-
-    List<BabyModel> _babies = [];
-  int? _selectedBabyAge; // The selected value, null if nothing selected yet
-
+  List<DropdownMenuEntry<int>> dropdownItems = [];
+  int? _selectedBabyAge;
 
 
 
@@ -48,21 +43,38 @@ class _MissionScreenState extends State<MissionScreen> {
   late MissionBrain _missionBrain;
   bool _isLoading = true;
 
+
   @override
   void initState() {
     super.initState();
-    _loadUserBabies();
-    _initializeMissionBrain();
-  }
-
-
-    Future<void> _loadUserBabies() async {
-    final babies = await _missionBrain.getBabiesForUser();
-    setState(() {
-      _babies = babies;
-      _selectedBabyAge = _babies.isNotEmpty ? _babies.first.babyAge : null;
+    _initializeMissionBrain().then((_) {
+      _fetchBabiesAndSetupDropdown();
     });
   }
+
+  Future<void> _fetchBabiesAndSetupDropdown() async {
+
+    List<BabyModel> babies = await _missionBrain.getBabiesForUser();
+
+    if (babies.isEmpty) {
+      print("No babies found for user");
+      setState(() {
+        dropdownItems = [];
+      });
+      return;
+    }
+
+    setState(() {
+      dropdownItems = babies
+          .map((baby) => DropdownMenuEntry<int>(
+                value: baby.babyAge,
+                label: baby.babyName,
+              ))
+          .toList();
+    });
+  }
+
+
 
 
 
@@ -106,6 +118,8 @@ class _MissionScreenState extends State<MissionScreen> {
 
 
 
+
+
 //   Future<void> _loadMissionsForSelectedBaby() async {
 //     if (_selectedBaby != null) {
 //       int babyAge = _selectedBaby!['babyAge'];
@@ -141,33 +155,19 @@ class _MissionScreenState extends State<MissionScreen> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // if (_selectedBaby != null)
-        //   DropdownButton<Map<String, dynamic>>(
-        //     value: _selectedBaby,
-        //     items: _babies.map((baby) {
-        //       return DropdownMenuItem<Map<String, dynamic>>(
-        //         value: baby,
-        //         child: Text(baby['babyName']),
-        //       );
-        //     }).toList(),
-        //     onChanged: (value) {
-        //       setState(() {
-        //         _selectedBaby = value;
-        //        // _loadMissionsForSelectedBaby();
-        //       });
-        //     },
-        //   ),
+        DropdownMenu<int>(
+           dropdownMenuEntries:dropdownItems,
+           onSelected: (int? age){
+            setState(() {
+              _selectedBabyAge = age;
+            });
+           },
+           ),
 
-       if (_babies.isNotEmpty)
-  BabyDropdownMenu(
-    babies: _babies,
-    onBabySelected: (BabyModel baby) {
-      setState(() {
-        _selectedBabyAge = baby.babyAge;
-      });
-      // You can add additional logic here to load missions for the selected baby
-    },
-  ),
+
+
+
+
 
 
 
@@ -208,77 +208,6 @@ class _MissionScreenState extends State<MissionScreen> {
 
         ),
       ],
-    );
-  }
-}
-
-
-
-
-
-
-
-class BabyDropdownMenu extends StatefulWidget {
-  final List<BabyModel> babies;
-  final Function(BabyModel) onBabySelected;
-
-  const BabyDropdownMenu({
-    super.key,
-    required this.babies,
-    required this.onBabySelected,
-  });
-
-  @override
-  State<BabyDropdownMenu> createState() => _BabyDropdownMenuState();
-}
-
-class _BabyDropdownMenuState extends State<BabyDropdownMenu> {
-  late BabyModel selectedBaby;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.babies.isNotEmpty) {
-      selectedBaby = widget.babies.first;
-    }
-  }
-
-  // Convert BabyModel to DropdownMenuEntry
-  List<DropdownMenuEntry<BabyModel>> _createMenuEntries() {
-    return widget.babies.map<DropdownMenuEntry<BabyModel>>((BabyModel baby) {
-      return DropdownMenuEntry<BabyModel>(
-        value: baby,
-        label: '${baby.babyName} (${baby.babyAge} months)',
-      );
-    }).toList();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.babies.isEmpty) {
-      return const Text('No babies available');
-    }
-
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: DropdownMenu<BabyModel>(
-        initialSelection: widget.babies.first,
-        onSelected: (BabyModel? value) {
-          if (value != null) {
-            setState(() {
-              selectedBaby = value;
-            });
-            widget.onBabySelected(value);
-          }
-        },
-        dropdownMenuEntries: _createMenuEntries(),
-        width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
-        menuStyle: MenuStyle(
-          backgroundColor: MaterialStateProperty.all(Colors.white),
-          elevation: MaterialStateProperty.all(8),
-        ),
-        textStyle: const TextStyle(fontSize: 16),
-      ),
     );
   }
 }

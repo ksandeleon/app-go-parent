@@ -35,34 +35,32 @@ class MissionBrain {
   }
 
 
-    //baby functions getMissionsByBabyMonthAge
-// Retrieve all babies linked to the logged-in user
-Future<List<BabyModel>> getBabiesForUser() async {
-  // Retrieve the logged-in user's ID from the UserSession
-  final userId = 1; // This should be replaced with UserSession().userId when implementing real user session logic
 
-  if (userId == null) {
-    print("[getBabiesForUser] No user is logged in.");
-    return [];
+
+  // Retrieve all babies linked to the logged-in user
+  Future<List<BabyModel>> getBabiesForUser() async {
+    // Retrieve the logged-in user's ID from the UserSession
+    //final userId = UserSession().userId;
+
+    final userId = 1; // This should be replaced with UserSession().userId when implementing real user session logic
+
+    if (userId == null) {
+      print("[getBabiesForUser] No user is logged in.");
+      return [];
+    }
+
+    print("[getBabiesForUser] Fetching babies for userId: $userId");
+
+    // Retrieve all babies linked to the user
+    final babies = await babyHelper.getBabiesByUserId(userId);
+
+    if (babies.isEmpty) {
+      print("[getBabiesForUser] No babies found for userId: $userId");
+      return [];
+    }
+
+    print("[getBabiesForUser] Found ${babies.length} babies for userId: $userId");
+
+    return babies;
   }
-
-  print("[getBabiesForUser] Fetching babies for userId: $userId");
-
-  // Retrieve all babies linked to the user
-  final babies = await babyHelper.getBabiesByUserId(userId);
-
-  if (babies.isEmpty) {
-    print("[getBabiesForUser] No babies found for userId: $userId");
-    return [];
-  }
-
-  print("[getBabiesForUser] Found ${babies.length} babies for userId: $userId");
-
-  return babies;
-}
-
-
-
-
-
 }

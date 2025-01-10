@@ -22,7 +22,6 @@ import 'screens/mission_page/mission_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-
   // Initialize sqflite for desktop platforms
   if (kIsWeb == false && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS)) {
     sqfliteFfiInit();
