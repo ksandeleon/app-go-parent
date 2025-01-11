@@ -3,6 +3,9 @@ import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
 
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+
 class MissionBrain {
   final MissionHelper missionHelper;
   final BabyHelper babyHelper;
@@ -15,6 +18,47 @@ class MissionBrain {
 
 //Missions funcions
 
+  final ImagePicker _picker = ImagePicker();
+  Future<XFile?> takePhotoOrPickFile() async {
+    try {
+      if (Platform.isIOS || Platform.isAndroid) {
+        // Mobile: Open the camera
+        print('DEBUG: Opening camera on mobile');
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 80,
+        );
+        if (photo != null) {
+          print('DEBUG: Photo captured successfully - ${photo.path}');
+          return photo;
+        } else {
+          print('DEBUG: No photo was taken - user cancelled');
+          return null;
+        }
+      } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+        // Desktop: Open file picker
+        print('DEBUG: Opening file picker on desktop');
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.gallery, // This will open the file system on desktop
+          imageQuality: 80,
+        );
+        if (photo != null) {
+          print('DEBUG: File selected successfully - ${photo.path}');
+          return photo;
+        } else {
+          print('DEBUG: No file was selected - user cancelled');
+          return null;
+        }
+      } else {
+        print('DEBUG: Unsupported platform');
+        return null;
+      }
+    } catch (e) {
+      print('DEBUG: Error handling photo/file - $e');
+      return null;
+    }
+  }
+
   Future<void> loadAllMissions() async {
     try {
       _missions = await missionHelper.getAllMissions();
@@ -25,7 +69,6 @@ class MissionBrain {
   }
 
   Future<void> getMissionsByAge(int babyAge) async {
-
     try {
       _missions =  await missionHelper.getMissionsByBabyMonthAge(babyAge);
     }
@@ -34,8 +77,6 @@ class MissionBrain {
       _missions = [];
     }
   }
-
-
 
   Future<List<MissionModel>> getMissionsByCategory(String category) async {
     try {
