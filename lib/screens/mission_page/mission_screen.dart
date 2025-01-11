@@ -118,12 +118,35 @@ class _MissionScreenState extends State<MissionScreen> {
     });
   }
 
+  bool validatePhotoSelection(String? photoPath) {
+    if (photoPath == null || photoPath.isEmpty) {
+      print('DEBUG: photoSelectionCancelled');
+      return false;
+    }
+      print('DEBUG: photoSelectionSuccess');
+    return true;
+  }
+
+  Future<void> handlePhotoSubmission(int missionId) async {
+      String? photoPath = await _missionBrain.takePhotoOrPickFile();
+
+    if (!validatePhotoSelection(photoPath)) {
+      print("no photo selected");
+      return; // Exit if no valid photo is selected
+    }
+
+    print('Photo validated successfully: $photoPath');
+
+
+
+    // Step 3: Proceed with other steps (e.g., updating DB)
+    // ...
+  }
 
 
 //experiments below until build
 
-
-
+//use usersession to update 
 
 
 
@@ -152,7 +175,6 @@ class _MissionScreenState extends State<MissionScreen> {
                 ),
               ),
 
-
         Text("data"),
         Expanded(
           child: DefaultTabController(
@@ -177,7 +199,8 @@ class _MissionScreenState extends State<MissionScreen> {
                         children: [
                           _missions.isEmpty
                               ? const Center(child: Text('No missions available'))
-                              : MissionList(onPhotoSubmit: _missionBrain.takePhotoOrPickFile ,missions: _missions),
+                              : MissionList(onPhotoSubmit: () => handlePhotoSubmission(1),
+                              missions: _missions),
                         ],
                       ),
                     ],
@@ -190,6 +213,11 @@ class _MissionScreenState extends State<MissionScreen> {
     );
   }
 }
+
+
+
+
+
 
 
 class MissionList extends StatelessWidget {

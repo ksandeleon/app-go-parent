@@ -20,7 +20,7 @@ class DatabaseService {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'goparent_v2.db');
+    String path = join(await getDatabasesPath(), 'goparent_v3.db');
     return await openDatabase(
       path,
       version: 1,
@@ -62,11 +62,26 @@ class DatabaseService {
         title TEXT NOT NULL,
         category TEXT NOT NULL,
         content TEXT NOT NULL,
-        isCompleted BOOLEAN DEFAULT 0,
         minAge INTEGER NOT NULL,
         maxAge INTEGER NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    ''');
+
+    // user_missions
+    await db.execute('''
+      CREATE TABLE user_missions (
+        userMissionId INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL,
+        missionId INTEGER NOT NULL,
+        isCompleted BOOLEAN DEFAULT 0,
+        completed_at TIMESTAMP,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- When user started the mission
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- For tracking any updates
+        FOREIGN KEY (userId) REFERENCES userdb(userId),
+        FOREIGN KEY (missionId) REFERENCES missionsdb(missionId),
+        UNIQUE (userId, missionId)
       )
     ''');
 
@@ -79,6 +94,7 @@ class DatabaseService {
         isCollage BOOLEAN DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (missionId) REFERENCES missionsdb(missionId)
+        FOREIGN KEY (userId) REFERENCES userdb(userId)
       )
     ''');
 
@@ -90,6 +106,7 @@ class DatabaseService {
         collageData TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        FOREIGN KEY (userId) REFERENCES userdb(userId)
       )
     ''');
 
@@ -117,12 +134,13 @@ class DatabaseService {
      // user rewards tracker
     await db.execute('''
       CREATE TABLE user_rewards (
+        userRewardId INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL,
         rewardId INTEGER NOT NULL,
-        isUnlocked BOOLEAN DEFAULT 0, -- Whether the reward is unlocked
+        isUnlocked BOOLEAN DEFAULT 0,
         FOREIGN KEY (userId) REFERENCES userdb(userId),
         FOREIGN KEY (rewardId) REFERENCES rewardsdb(rewardId),
-        PRIMARY KEY (userId, rewardId)
+        UNIQUE (userId, rewardId)
       )
     ''');
 

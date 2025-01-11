@@ -16,48 +16,52 @@ class MissionBrain {
 
   List<MissionModel> get missions => _missions;
 
-//Missions funcions
-final ImagePicker _picker = ImagePicker();
+  //Missions funcions
+  final ImagePicker _picker = ImagePicker();
 
-Future<String?> takePhotoOrPickFile() async {
-  try {
-    if (Platform.isIOS || Platform.isAndroid) {
-      // Mobile: Open the camera
-      print('DEBUG: Opening camera on mobile');
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 80,
-      );
-      if (photo != null) {
-        print('DEBUG: Photo captured successfully - ${photo.path}');
-        return photo.path; // Return the path as String
+  Future<String?> takePhotoOrPickFile() async {
+    try {
+      if (Platform.isIOS || Platform.isAndroid) {
+        // Mobile: Open the camera
+        print('DEBUG: Opening camera on mobile');
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.camera,
+          imageQuality: 80,
+        );
+        if (photo != null) {
+          print('DEBUG: Photo captured successfully - ${photo.path}');
+          return photo.path; // Return the path as String
+        } else {
+          print('DEBUG: No photo was taken - user cancelled');
+          return null;
+        }
+      } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
+        // Desktop: Open file picker
+        print('DEBUG: Opening file picker on desktop');
+        final XFile? photo = await _picker.pickImage(
+          source: ImageSource.gallery, // This will open the file system on desktop
+          imageQuality: 80,
+        );
+        if (photo != null) {
+          print('DEBUG: File selected successfully - ${photo.path}');
+          return photo.path; // Return the path as String
+        } else {
+          print('DEBUG: No file was selected - user cancelled');
+          return null;
+        }
       } else {
-        print('DEBUG: No photo was taken - user cancelled');
+        print('DEBUG: Unsupported platform');
         return null;
       }
-    } else if (Platform.isLinux || Platform.isMacOS || Platform.isWindows) {
-      // Desktop: Open file picker
-      print('DEBUG: Opening file picker on desktop');
-      final XFile? photo = await _picker.pickImage(
-        source: ImageSource.gallery, // This will open the file system on desktop
-        imageQuality: 80,
-      );
-      if (photo != null) {
-        print('DEBUG: File selected successfully - ${photo.path}');
-        return photo.path; // Return the path as String
-      } else {
-        print('DEBUG: No file was selected - user cancelled');
-        return null;
-      }
-    } else {
-      print('DEBUG: Unsupported platform');
+    } catch (e) {
+      print('DEBUG: Error handling photo/file - $e');
       return null;
     }
-  } catch (e) {
-    print('DEBUG: Error handling photo/file - $e');
-    return null;
   }
-}
+
+
+
+
   Future<void> loadAllMissions() async {
     try {
       _missions = await missionHelper.getAllMissions();

@@ -14,6 +14,15 @@ class MissionHelper {
     );
   }
 
+  /// Update the isCompleted column to 1 for a specific mission
+  Future<int> markMissionAsCompleted(int missionId) async {
+    return await db.update(
+      'missionsdb',
+      {'isCompleted': 1},
+      where: 'missionId = ?',
+      whereArgs: [missionId],
+    );
+  }
 
   /// Retrieve a mission by ID
   Future<MissionModel?> getMissionById(int missionId) async {
