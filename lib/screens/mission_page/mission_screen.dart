@@ -192,155 +192,52 @@ class _MissionScreenState extends State<MissionScreen> {
 }
 
 
-// class MissionList extends StatelessWidget {
-//   final List<MissionModel> missions;
-//   final void Function() onPhotoSubmit;
+class MissionList extends StatelessWidget {
+  final List<MissionModel> missions;
+  final void Function() onPhotoSubmit;
 
-//   const MissionList({
-//     Key? key,
-//     required this.missions,
-//     required this.onPhotoSubmit,
+  const MissionList({
+    Key? key,
+    required this.missions,
+    required this.onPhotoSubmit,
 
-//   }) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     // Add this debug print
-//     print("Building MissionList with ${missions.length} missions");
-
-//     if (missions.isEmpty) {
-//       return const Center(
-//         child: Text('No missions available'),
-//       );
-//     }
-
-//     return Expanded(
-
-//       child: ListView.builder(
-//         itemCount: missions.length,
-//         itemBuilder: (context, index) {
-//           final mission = missions[index];
-//           if (mission == null) {
-//             print("Null mission at index $index");
-//             return const SizedBox.shrink();
-//           }
-
-//           return Card(
-//             elevation: 6,
-//             shape: RoundedRectangleBorder(
-//             borderRadius: BorderRadius.circular(20), ),
-//             margin: const EdgeInsets.all(10.0),
-
-//             child: Padding(
-//               padding: const EdgeInsets.all(12.0),
-//               child: Column(
-//                 crossAxisAlignment: CrossAxisAlignment.start,
-//                 children: [
-
-//                   ListTile(
-//                     title: Text(mission.title ,
-//                           style: const TextStyle(
-//                           fontWeight: FontWeight.bold,
-//                           fontSize: 18,
-//                         ),
-//                       ),
-//                     subtitle: Text(mission.content,
-//                     style: const TextStyle(
-//                     color: Colors.black87,
-//                     fontSize: 16,), ),
-//                     trailing: Icon(
-//                       mission.isCompleted ? Icons.circle_outlined : Icons.check_circle ,
-//                       color: mission.isCompleted ? Colors.green : Colors.grey,
-//                     ),
-//                   ),
-
-//                   const SizedBox(width: 10),
-//                     ElevatedButton.icon(
-//                       style: ElevatedButton.styleFrom(
-//                         backgroundColor: Colors.teal,
-//                         shape: RoundedRectangleBorder(
-//                           borderRadius: BorderRadius.circular(10),
-//                         ),
-//                       ),
-//                       onPressed: () => onPhotoSubmit(),
-//                       icon: const Icon(Icons.camera_alt, color: Colors.white,),
-//                       label: const Text('Submit Photo',  style: TextStyle(color: Colors.white),),
-//                     ),
-
-//                 ],
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-
-
-
-
-
-
-
-
-
-  class MissionList extends StatefulWidget {
-    final List<MissionModel> missions;
-    final Future<String?> Function() onPhotoSubmit;
-
-    const MissionList({
-      Key? key,
-      required this.missions,
-      required this.onPhotoSubmit,
-    }) : super(key: key);
-
-    @override
-    _MissionListState createState() => _MissionListState();
-  }
-
-  class _MissionListState extends State<MissionList> {
-    bool isSubmitting = false;
-    String? photoPath;
-
-    Future<void> handlePhotoSubmission() async {
-      setState(() {
-        isSubmitting = true;
-        photoPath = null;
-      });
-
-      try {
-        final String? result = await widget.onPhotoSubmit();
-        setState(() {
-          photoPath = result; // Store the path or result
-        });
-      } catch (e) {
-        print('Error: $e');
-      } finally {
-        setState(() {
-          isSubmitting = false;
-        });
-      }
-    }
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: widget.missions.length,
-      itemBuilder: (context, index) {
-        final mission = widget.missions[index];
-        return Card(
-          elevation: 6,
-          shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20), ),
-          margin: const EdgeInsets.all(10.0),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
+    // Add this debug print
+    print("Building MissionList with ${missions.length} missions");
 
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    if (missions.isEmpty) {
+      return const Center(
+        child: Text('No missions available'),
+      );
+    }
 
-                ListTile(
+    return Expanded(
+
+      child: ListView.builder(
+        itemCount: missions.length,
+        itemBuilder: (context, index) {
+          final mission = missions[index];
+          if (mission == null) {
+            print("Null mission at index $index");
+            return const SizedBox.shrink();
+          }
+
+          return Card(
+            elevation: 6,
+            shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20), ),
+            margin: const EdgeInsets.all(10.0),
+
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+
+                  ListTile(
                     title: Text(mission.title ,
                           style: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -357,19 +254,7 @@ class _MissionScreenState extends State<MissionScreen> {
                     ),
                   ),
 
-                // if (photoPath != null)
-                //   Text('Photo submitted: $photoPath'),
-                // ElevatedButton(
-                //   onPressed: isSubmitting ? null : handlePhotoSubmission,
-                //   child: isSubmitting
-                //       ? const CircularProgressIndicator()
-                //       : const Text('Submit Photo'),
-                // ),
-
-
-                const SizedBox(width: 10),
-                if (photoPath != null)
-                  Text('Photo submitted: $photoPath'),
+                  const SizedBox(width: 10),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.teal,
@@ -377,17 +262,20 @@ class _MissionScreenState extends State<MissionScreen> {
                           borderRadius: BorderRadius.circular(10),
                         ),
                       ),
-                      onPressed: isSubmitting ? null : handlePhotoSubmission,
-
+                      onPressed: () => onPhotoSubmit(),
                       icon: const Icon(Icons.camera_alt, color: Colors.white,),
                       label: const Text('Submit Photo',  style: TextStyle(color: Colors.white),),
-
                     ),
-              ],
+
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
+
+
+
 }
