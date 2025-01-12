@@ -32,12 +32,12 @@ class _MissionScreenState extends State<MissionScreen> {
 
 
 
-
   @override
   void initState() {
     super.initState();
     _initializeMissionBrain();
   }
+
 
   Future<void> _initializeMissionBrain() async {
     sqfliteFfiInit();
@@ -55,10 +55,6 @@ class _MissionScreenState extends State<MissionScreen> {
 
     await _loadMissions();
     await  _fetchBabiesAndSetupDropdown();
-  }
-
-  void printFunc (){
-    print("printFunc");
   }
 
 
@@ -95,6 +91,7 @@ class _MissionScreenState extends State<MissionScreen> {
     }
   }
 
+
   Future<void> _fetchMissions() async {
     if (_selectedBabyAge == null) return;
 
@@ -111,6 +108,7 @@ class _MissionScreenState extends State<MissionScreen> {
       setState(() => _isLoading = false);
     }
   }
+
 
   Future<void> _loadMissions() async {
     setState(() {
@@ -130,14 +128,6 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
 
-
-//experiments below until build
-
-//use usersession to update
-
-
-
-
   // void _completeMission(int missionIndex) {
   //   setState(() {
   //     _missionCompleted[missionIndex] = true;
@@ -147,11 +137,17 @@ class _MissionScreenState extends State<MissionScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Go Missions'),
+        backgroundColor: Colors.teal,
+      ),
+      body: _isLoading
+        ? Center(child: CircularProgressIndicator())
+        : Column(
+            children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(12.0),
                 child: DropdownMenu<int>(
                   dropdownMenuEntries: dropdownItems,
                   initialSelection: _selectedBabyAge,
@@ -162,139 +158,84 @@ class _MissionScreenState extends State<MissionScreen> {
                 ),
               ),
 
-        Text("data"),
-        Expanded(
-          child: DefaultTabController(
-            length: 1,
-            child: Scaffold(
-              backgroundColor: Colors.grey[200],
-              appBar: AppBar(
-                elevation: 8,
-                backgroundColor: Colors.teal,
-                title: const Text('Go Missions'),
-                bottom: const TabBar(
-                  tabs: [
-                    Tab(text: 'Missions'),
-                  ],
-                ),
-              ),
-              body: _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : TabBarView(
-                    children: [
-                      Column(
+              Expanded(
+                child: _missions.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _missions.isEmpty
-                              ? const Center(child: Text('No missions available'))
-                              :
-                              MissionList(
-                                onPhotoSubmit: () => _missionBrain.completeMissionWithPhoto(1),
-                                // onPhotoSubmit: () => printFunc(),
-                                missions: _missions
-                              )
+                          Icon(Icons.inbox, size: 64, color: Colors.grey),
+                          const SizedBox(height: 16),
+                          const Text('No missions available', style: TextStyle(fontSize: 18)),
                         ],
                       ),
-                    ],
-                  ),
-            ),
-          ),
+                    )
+                  :
 
-        ),
-      ],
-    );
-  }
-}
-
-
-
-
-
-
-
-class MissionList extends StatelessWidget {
-  final List<MissionModel> missions;
-  final void Function() onPhotoSubmit;
-
-  const MissionList({
-    Key? key,
-    required this.missions,
-    required this.onPhotoSubmit,
-
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    // Add this debug print
-    print("Building MissionList with ${missions.length} missions");
-
-    if (missions.isEmpty) {
-      return const Center(
-        child: Text('No missions available'),
-      );
-    }
-
-    return Expanded(
-
-      child: ListView.builder(
-        itemCount: missions.length,
-        itemBuilder: (context, index) {
-          final mission = missions[index];
-          if (mission == null) {
-            print("Null mission at index $index");
-            return const SizedBox.shrink();
-          }
-
-          return Card(
-            elevation: 6,
-            shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20), ),
-            margin: const EdgeInsets.all(10.0),
-
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  ListTile(
-                    title: Text(mission.title ,
-                          style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
+                  ListView.builder(
+                          itemCount: _missions.length,
+                          itemBuilder: (context, index) {
+                            final mission = _missions[index];
+                            if (mission == null) {
+                              print("Null mission at index $index");
+                              return const SizedBox.shrink();
+                            }
+                            return Card(
+                              elevation: 6,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              margin: const EdgeInsets.all(10.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(12.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                        mission.title,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        mission.content,
+                                        style: const TextStyle(
+                                          color: Colors.black87,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    ElevatedButton.icon(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.teal,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      onPressed: () =>
+                                          _missionBrain.completeMissionWithPhoto(1),
+                                      icon: const Icon(
+                                        Icons.camera_alt,
+                                        color: Colors.white,
+                                      ),
+                                      label: const Text(
+                                        'Submit Photo',
+                                        style: TextStyle(color: Colors.white),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
                         ),
-                      ),
-                    subtitle: Text(mission.content,
-                    style: const TextStyle(
-                    color: Colors.black87,
-                    fontSize: 16,), ),
-                    // // trailing: Icon(
-                    // //   missi ? Icons.circle_outlined : Icons.check_circle ,
-                    // //   color: mission.isCompleted ? Colors.green : Colors.grey,
-                    // ),
-                  ),
-
-                  const SizedBox(width: 10),
-                    ElevatedButton.icon(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.teal,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () => onPhotoSubmit(),
-                      icon: const Icon(Icons.camera_alt, color: Colors.white,),
-                      label: const Text('Submit Photo',  style: TextStyle(color: Colors.white),),
-                    ),
-
-                ],
+                
               ),
-            ),
-          );
-        },
-      ),
+            ],
+          ),
     );
   }
-
-
-
 }
