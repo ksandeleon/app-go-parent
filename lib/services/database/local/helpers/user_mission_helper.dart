@@ -104,4 +104,21 @@ class UserMissionHelper {
     final db = await DatabaseService.instance.database;
     await db.delete(tableName);
   }
+
+  Future<Set<int>> getUserCompletedMissions(int userId) async {
+    final db = await DatabaseService.instance.database;
+
+    final List<Map<String, dynamic>> results = await db.query(
+      tableName,
+      columns: ['missionId'],  // Only select the missionId column for efficiency
+      where: 'userId = ? AND isCompleted = ?',
+      whereArgs: [userId, 1],  // 1 represents true in SQLite
+    );
+
+    // Convert the results to a Set of mission IDs
+    return results.map<int>((row) => row['missionId'] as int).toSet();
+  }
+
+
+
 }

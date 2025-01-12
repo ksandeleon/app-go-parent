@@ -25,7 +25,7 @@ class _MissionScreenState extends State<MissionScreen> {
 
   List<DropdownMenuEntry<int>> dropdownItems = [];
   int? _selectedBabyAge;
-  List<MissionModel> _missions = [];
+  List<MissionWithStatus> _missions = [];
   late MissionBrain _missionBrain;
   bool _isLoading = true;
   String? photoPath;
@@ -97,10 +97,23 @@ class _MissionScreenState extends State<MissionScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await _missionBrain.getMissionsByAge(_selectedBabyAge!);
-      // await _missionBrain.loadAllMissions();
+      // 1. First fetch all missions for the age
+      List<MissionModel> ageMissions = await _missionBrain.getMissionsByAge(_selectedBabyAge!);
+
+      // 2. Get current user's completed missions
+      final userId = UserSession().userId;
+      final completedMissions = await _missionBrain.userMissionHelper.getUserCompletedMissions(userId!);
+
+      // 3. Create MissionWithStatus objects
+      final missionsWithStatus = ageMissions.map((mission) =>
+        MissionWithStatus(
+          mission: mission,
+          isCompleted: completedMissions.contains(mission.missionId)
+        )
+      ).toList();
+
       setState(() {
-        _missions = _missionBrain.missions;  // Assuming you have a getter for missions
+        _missions = missionsWithStatus;
       });
     } catch (e) {
       print('Error fetching missions: $e');
@@ -108,6 +121,7 @@ class _MissionScreenState extends State<MissionScreen> {
       setState(() => _isLoading = false);
     }
   }
+
 
 
   Future<void> _loadMissions() async {
@@ -170,72 +184,92 @@ class _MissionScreenState extends State<MissionScreen> {
                         ],
                       ),
                     )
+
                   :
 
+
                   ListView.builder(
-                          itemCount: _missions.length,
-                          itemBuilder: (context, index) {
-                            final mission = _missions[index];
-                            if (mission == null) {
-                              print("Null mission at index $index");
-                              return const SizedBox.shrink();
-                            }
-                            return Card(
-                              elevation: 6,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              margin: const EdgeInsets.all(10.0),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    ListTile(
-                                      title: Text(
-                                        mission.title,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        mission.content,
-                                        style: const TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 16,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 10),
-                                    ElevatedButton.icon(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.teal,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
-                                      onPressed: () =>
-                                          _missionBrain.completeMissionWithPhoto(1),
-                                      icon: const Icon(
-                                        Icons.camera_alt,
-                                        color: Colors.white,
-                                      ),
-                                      label: const Text(
-                                        'Submit Photo',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                
+  itemCount: _missions.length,
+  itemBuilder: (context, index) {
+    final missionWithStatus = _missions[index];
+    final mission = missionWithStatus.mission;
+
+    return Card(
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+      ),
+      margin: const EdgeInsets.all(10.0),
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ListTile(
+              title: Text(
+                mission.title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+              ),
+              subtitle: Text(
+                mission.content,
+                style: const TextStyle(
+                  color: Colors.black87,
+                  fontSize: 16,
+                ),
+              ),
+              trailing: Icon(
+                missionWithStatus.isCompleted
+                    ? Icons.check_circle
+                    : Icons.circle_outlined,
+                color: missionWithStatus.isCompleted
+                    ? Colors.green
+                    : Colors.grey,
+              ),
+            ),
+            if (!missionWithStatus.isCompleted) ...[
+              const SizedBox(width: 10),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.teal,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                onPressed: () async {
+                  if (mission.missionId != null) {
+                    await _missionBrain.completeMissionWithPhoto(mission.missionId!);
+                    await _fetchMissions(); // Refresh the list
+                  }
+                },
+                icon: const Icon(Icons.camera_alt, color: Colors.white),
+                label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  },
+)
+
               ),
             ],
           ),
     );
   }
+}
+
+
+
+class MissionWithStatus {
+  final MissionModel mission;
+  bool isCompleted;
+
+  MissionWithStatus({
+    required this.mission,
+    this.isCompleted = false,
+  });
 }

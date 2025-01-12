@@ -198,24 +198,20 @@ class MissionBrain {
     }
   }
 
-  Future<void> getMissionsByAge(int babyAge) async {
-    try {
-      _missions =  await missionHelper.getMissionsByBabyMonthAge(babyAge);
-    }
-    catch (e) {
-      print('Error loading missions by age: $e');
-      _missions = [];
-    }
+  Future<List<MissionModel>> getMissionsByAge(int age) async {
+    final missions = await missionHelper.getMissionsByBabyMonthAge(age);
+    return missions.map((mission) => MissionModel(
+      missionId: mission.missionId,
+      title: mission.title,
+      category: mission.category,
+      content: mission.content,
+      minAge: mission.minAge,
+      maxAge: mission.maxAge,
+      createdAt: mission.createdAt,
+      updatedAt: mission.updatedAt
+    )).toList();
   }
 
-  Future<List<MissionModel>> getMissionsByCategory(String category) async {
-    try {
-      return await missionHelper.getMissionsByCategory(category);
-    } catch (e) {
-      print('Error loading missions by category: $e');
-      return [];
-    }
-  }
 
   // Retrieve all babies linked to the logged-in user
   Future<List<BabyModel>> getBabiesForUser() async {
