@@ -1,16 +1,12 @@
-import 'dart:collection';
 import 'package:flutter/material.dart';
 import 'package:go_parent/Screen/prototypeMissionGraph.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
+import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
 import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
-import 'package:go_parent/utilities/user_session.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'dart:io';
-import 'widgets/tab_controller.dart';
 import 'package:go_parent/screens/mission_page/mission_brain.dart';
 
 class MissionScreen extends StatefulWidget {
@@ -40,12 +36,17 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
   Future<void> _initializeMissionBrain() async {
-    // Initialize database
-    final db = await openDatabase('goparent_v2.db');
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+
+    final dbService = DatabaseService.instance;
+    final db = await dbService.database;
+
     final missionHelper = MissionHelper(db);
     final babyHelper = BabyHelper(db);
+    final pictureHelper = PictureHelper(db);
 
-    _missionBrain = MissionBrain(missionHelper, babyHelper);
+    _missionBrain = MissionBrain(missionHelper, babyHelper, pictureHelper);
 
     await _loadMissions();
     await  _fetchBabiesAndSetupDropdown();
@@ -118,35 +119,11 @@ class _MissionScreenState extends State<MissionScreen> {
     });
   }
 
-  bool validatePhotoSelection(String? photoPath) {
-    if (photoPath == null || photoPath.isEmpty) {
-      print('DEBUG: photoSelectionCancelled');
-      return false;
-    }
-      print('DEBUG: photoSelectionSuccess');
-    return true;
-  }
-
-  Future<void> handlePhotoSubmission(int missionId) async {
-      String? photoPath = await _missionBrain.takePhotoOrPickFile();
-
-    if (!validatePhotoSelection(photoPath)) {
-      print("no photo selected");
-      return; // Exit if no valid photo is selected
-    }
-
-    print('Photo validated successfully: $photoPath');
-
-
-
-    // Step 3: Proceed with other steps (e.g., updating DB)
-    // ...
-  }
 
 
 //experiments below until build
 
-//use usersession to update 
+//use usersession to update
 
 
 
@@ -199,7 +176,7 @@ class _MissionScreenState extends State<MissionScreen> {
                         children: [
                           _missions.isEmpty
                               ? const Center(child: Text('No missions available'))
-                              : MissionList(onPhotoSubmit: () => handlePhotoSubmission(1),
+                              : MissionList(onPhotoSubmit: () => _missionBrain.handlePhotoSubmission(1),
                               missions: _missions),
                         ],
                       ),

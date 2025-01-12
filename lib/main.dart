@@ -15,6 +15,7 @@ import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/widgets/side_menu.dart';
 import 'package:go_parent/screens/welcome_page/welcome_screen.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/welcome_page/splash_screen.dart';
 import 'screens/mission_page/mission_screen.dart';
@@ -22,13 +23,16 @@ import 'screens/mission_page/mission_screen.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize sqflite for desktop platforms
   if (kIsWeb == false && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS)) {
     sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi; // Set the database factory to ffi
+    databaseFactory = databaseFactoryFfi;
   }
 
-  // Initialize the database
+  // Delete old database files (optional, for cleanup)
+  await deleteDatabase(join(await getDatabasesPath(), 'goparent_v2.db'));
+  await deleteDatabase(join(await getDatabasesPath(), 'goparent_v3.db'));
+
+
   await DatabaseService.instance.database;
 
   SystemChrome.setSystemUIOverlayStyle(
@@ -60,7 +64,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      initialRoute: 'home_screen',
+      initialRoute: 'welcome_screen',
       routes: {
         // GalleryScreen.id: (context) => GalleryScreen(),
         WelcomeScreen.id: (context) => WelcomeScreen(), // welcome_screen

@@ -6,8 +6,30 @@ class PictureHelper {
 
   PictureHelper(this.db);
 
-  /// Insert a new picture into the database
-  Future<int> insertPicture(PictureModel picture) async {
+  Future<int> insertPicture({
+    required int userId,
+    required int userMissionId,
+    required String photoPath,
+    bool isCollage = false,
+  }) async {
+    // First verify the user_mission exists and belongs to the user
+    final userMission = await db.query(
+      'user_missions',
+      where: 'userMissionId = ? AND userId = ?',
+      whereArgs: [userMissionId, userId],
+    );
+
+    if (userMission.isEmpty) {
+      throw Exception('Invalid userMissionId or userId combination');
+    }
+
+    final picture = PictureModel(
+      userId: userId,
+      userMissionId: userMissionId,
+      photoPath: photoPath,
+      isCollage: isCollage,
+    );
+
     return await db.insert(
       'picturesdb',
       picture.toMap(),

@@ -20,14 +20,15 @@ class DatabaseService {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'goparent_v3.db');
+    String path = join(await getDatabasesPath(), 'goparent_v5.db');
     return await openDatabase(
       path,
       version: 1,
       onCreate: _onCreate,
     );
   }
-    Future<void> _onCreate(Database db, int version) async {
+
+  Future<void> _onCreate(Database db, int version) async {
     // userdb
     await db.execute('''
       CREATE TABLE userdb (
@@ -71,17 +72,14 @@ class DatabaseService {
 
     // user_missions
     await db.execute('''
-      CREATE TABLE user_missions (
+      CREATE TABLE usermissionsdb (
         userMissionId INTEGER PRIMARY KEY AUTOINCREMENT,
         userId INTEGER NOT NULL,
         missionId INTEGER NOT NULL,
         isCompleted BOOLEAN DEFAULT 0,
-        completed_at TIMESTAMP,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- When user started the mission
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- For tracking any updates
+        completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (userId) REFERENCES userdb(userId),
-        FOREIGN KEY (missionId) REFERENCES missionsdb(missionId),
-        UNIQUE (userId, missionId)
+        FOREIGN KEY (missionId) REFERENCES missionsdb(missionId)
       )
     ''');
 
@@ -89,11 +87,12 @@ class DatabaseService {
     await db.execute('''
       CREATE TABLE picturesdb (
         pictureId INTEGER PRIMARY KEY AUTOINCREMENT,
-        missionId INTEGER NOT NULL,
-        photoContent TEXT NOT NULL,
+        userMissionId INTEGER NOT NULL,
+        userId INTEGER NOT NULL,
+        photoPath TEXT NOT NULL,
         isCollage BOOLEAN DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (missionId) REFERENCES missionsdb(missionId)
+        FOREIGN KEY (userMissionId) REFERENCES usermissionsdb(userMissionId),
         FOREIGN KEY (userId) REFERENCES userdb(userId)
       )
     ''');
@@ -102,10 +101,11 @@ class DatabaseService {
     await db.execute('''
       CREATE TABLE collagedb (
         collageId INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL,
         title TEXT NOT NULL,
         collageData TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (userId) REFERENCES userdb(userId)
       )
     ''');
@@ -121,7 +121,7 @@ class DatabaseService {
       )
     ''');
 
-    // rewards ../Type of reward (e.g., "collage_style", "badge")
+    // rewards
     await db.execute('''
       CREATE TABLE rewardsdb (
         rewardId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -139,8 +139,7 @@ class DatabaseService {
         rewardId INTEGER NOT NULL,
         isUnlocked BOOLEAN DEFAULT 0,
         FOREIGN KEY (userId) REFERENCES userdb(userId),
-        FOREIGN KEY (rewardId) REFERENCES rewardsdb(rewardId),
-        UNIQUE (userId, rewardId)
+        FOREIGN KEY (rewardId) REFERENCES rewardsdb(rewardId)
       )
     ''');
 
@@ -178,8 +177,6 @@ class DatabaseService {
     //   )
     // ''');
   }
-
-//wafansdanfasdfmdsa
 
 Future<void> listTables() async {
   final db = await DatabaseService.instance.database;
