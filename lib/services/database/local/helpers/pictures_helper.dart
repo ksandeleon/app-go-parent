@@ -14,7 +14,7 @@ class PictureHelper {
   }) async {
     // First verify the user_mission exists and belongs to the user
     final userMission = await db.query(
-      'user_missions',
+      'usermissionsdb',
       where: 'userMissionId = ? AND userId = ?',
       whereArgs: [userMissionId, userId],
     );

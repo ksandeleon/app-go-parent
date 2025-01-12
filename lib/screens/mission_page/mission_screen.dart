@@ -3,9 +3,11 @@ import 'package:go_parent/Screen/prototypeMissionGraph.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
+import 'package:go_parent/services/database/local/helpers/user_mission_helper.dart';
 import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
+import 'package:go_parent/utilities/user_session.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:go_parent/screens/mission_page/mission_brain.dart';
 
@@ -29,6 +31,8 @@ class _MissionScreenState extends State<MissionScreen> {
   String? photoPath;
 
 
+
+
   @override
   void initState() {
     super.initState();
@@ -45,11 +49,16 @@ class _MissionScreenState extends State<MissionScreen> {
     final missionHelper = MissionHelper(db);
     final babyHelper = BabyHelper(db);
     final pictureHelper = PictureHelper(db);
+    final userMissionHelper = UserMissionHelper();
 
-    _missionBrain = MissionBrain(missionHelper, babyHelper, pictureHelper);
+    _missionBrain = MissionBrain(missionHelper, babyHelper, pictureHelper, userMissionHelper);
 
     await _loadMissions();
     await  _fetchBabiesAndSetupDropdown();
+  }
+
+  void printFunc (){
+    print("printFunc");
   }
 
 
@@ -92,6 +101,7 @@ class _MissionScreenState extends State<MissionScreen> {
     setState(() => _isLoading = true);
     try {
       await _missionBrain.getMissionsByAge(_selectedBabyAge!);
+      // await _missionBrain.loadAllMissions();
       setState(() {
         _missions = _missionBrain.missions;  // Assuming you have a getter for missions
       });
@@ -176,8 +186,12 @@ class _MissionScreenState extends State<MissionScreen> {
                         children: [
                           _missions.isEmpty
                               ? const Center(child: Text('No missions available'))
-                              : MissionList(onPhotoSubmit: () => _missionBrain.handlePhotoSubmission(1),
-                              missions: _missions),
+                              :
+                              MissionList(
+                                onPhotoSubmit: () => _missionBrain.completeMissionWithPhoto(1),
+                                // onPhotoSubmit: () => printFunc(),
+                                missions: _missions
+                              )
                         ],
                       ),
                     ],
@@ -253,10 +267,10 @@ class MissionList extends StatelessWidget {
                     style: const TextStyle(
                     color: Colors.black87,
                     fontSize: 16,), ),
-                    trailing: Icon(
-                      mission.isCompleted ? Icons.circle_outlined : Icons.check_circle ,
-                      color: mission.isCompleted ? Colors.green : Colors.grey,
-                    ),
+                    // // trailing: Icon(
+                    // //   missi ? Icons.circle_outlined : Icons.check_circle ,
+                    // //   color: mission.isCompleted ? Colors.green : Colors.grey,
+                    // ),
                   ),
 
                   const SizedBox(width: 10),

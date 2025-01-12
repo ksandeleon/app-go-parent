@@ -4,8 +4,7 @@ import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
 import 'package:go_parent/services/database/local/helpers/user_mission_helper.dart';
 import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
-import 'package:go_parent/services/database/local/models/pictures_model.dart';
-
+import 'package:go_parent/utilities/user_session.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 
@@ -23,6 +22,111 @@ class MissionBrain {
 
   //Missions funcions
   final ImagePicker _picker = ImagePicker();
+
+  Future<bool> completeMission(int userId, int missionId) async {
+    try {
+      // Mark mission as completed and get the userMissionId in one transaction
+      final result = await userMissionHelper.markMissionAsCompleted(
+        userId: userId,
+        missionId: missionId
+      );
+
+      if (result <= 0) {
+        print('Failed to complete the mission for userId: $userId, missionId: $missionId');
+        return false;
+      }
+
+      // Get the userMissionId right after completion
+      final userMissionId = await getUserMissionId(userId, missionId);
+      if (userMissionId == null) {
+        print('Failed to get userMissionId after completion');
+        return false;
+      }
+
+      return true;
+    } catch (e) {
+      print('Error completing mission for userId: $userId, missionId: $missionId: $e');
+      return false;
+    }
+  }
+
+  Future<int?> savePhotoToDatabase(
+    int userMissionId,
+    int userId,
+    String photoPath,
+    {bool isCollage = false}
+  ) async {
+    try {
+      return await pictureHelper.insertPicture(
+        userId: userId,
+        userMissionId: userMissionId,
+        photoPath: photoPath,
+        isCollage: isCollage,
+      );
+    } catch (e) {
+      print('Error saving photo to database: $e');
+      return null;
+    }
+  }
+
+  Future<bool> completeMissionWithPhoto(
+    int missionId,
+    {bool isCollage = false}
+  ) async {
+    // Retrieve the logged-in user's ID from the UserSession singleton
+    final userId = UserSession().userId;
+
+    // Check if user is logged in
+    if (userId == null) {
+      print("No user is logged in.");
+      return false;
+    }
+
+    String? photoPath = await takePhotoOrPickFile();
+
+    if (!validatePhotoSelection(photoPath)) {
+      print("No photo selected");
+      return false;
+    }
+
+    print('Photo validated successfully: $photoPath');
+
+    try {
+      // First complete the mission
+      final completed = await completeMission(userId, missionId);
+      if (!completed) {
+        return false;
+      }
+
+      // Get the userMissionId
+      final userMissionId = await getUserMissionId(userId, missionId);
+      if (userMissionId == null) {
+        return false;
+      }
+
+      // Save the photo
+      final photoId = await savePhotoToDatabase(
+        userMissionId,
+        userId,
+        photoPath!,
+        isCollage: isCollage
+      );
+
+      return photoId != null;
+    } catch (e) {
+      print('Error in completeMissionWithPhoto: $e');
+      return false;
+    }
+  }
+
+
+
+
+
+
+
+
+
 
   Future<String?> takePhotoOrPickFile() async {
     try {
@@ -65,6 +169,17 @@ class MissionBrain {
   }
 
 
+  Future<int?> getUserMissionId(int userId, int missionId) async {
+  try {
+    final result = await userMissionHelper.getUserMissionId(userId: userId, missionId: missionId);
+    return result;
+  } catch (e) {
+    print('Error getting userMissionId: $e');
+    return null;
+  }
+}
+
+
   bool validatePhotoSelection(String? photoPath) {
     if (photoPath == null || photoPath.isEmpty) {
       print('DEBUG: photoSelectionCancelled');
@@ -73,78 +188,6 @@ class MissionBrain {
       print('DEBUG: photoSelectionSuccess');
     return true;
   }
-
-  //completeMission(int userId, int missionId)
-  Future<void> completeMission(int userId, int missionId) async {
-  try {
-    // Call the helper function to mark the mission as completed
-    final result = await userMissionHelper.markMissionAsCompleted(userId: userId, missionId: missionId);
-
-    if (result > 0) {
-      print('Mission successfully completed for userId: $userId, missionId: $missionId.');
-    } else {
-      print('Failed to complete the mission for userId: $userId, missionId: $missionId.');
-    }
-  } catch (e) {
-    print('Error completing mission for userId: $userId, missionId: $missionId: $e');
-  }
-
-  //and then retrieve that exact entry from usermissions, were gonna need it to savephotoindb
-}
-
-  //savePhotoToDatabase(int userMissionId, int userId, String photoPath, {bool isCollage = false})
-  Future<int> savePhotoToDatabase(
-    int userMissionId,
-    int userId,
-    String photoPath,
-    {bool isCollage = false}
-  ) async {
-    return await pictureHelper.insertPicture(
-      userId: userId,
-      userMissionId: userMissionId,
-      photoPath: photoPath,
-      isCollage: isCollage,
-    );
-  }
-  //getUserMissionId(int userId, int missionId)
-
-
-
-  Future<void> handlePhotoSubmission(int missionId) async {
-    String? photoPath = await takePhotoOrPickFile();
-
-    if (!validatePhotoSelection(photoPath)) {
-      print("no photo selected");
-      return;
-    }
-
-    print('Photo validated successfully: $photoPath');
-
-    // Create a PictureModel with the relevant data
-    PictureModel picture = PictureModel(
-      //change to usersessionid
-      userId: 1,
-      userMissionId: missionId, // Assuming missionId is the userMissionId for simplicity
-      photoPath: photoPath!,  // Photo path from the selected image
-    );
-
-    // Insert the picture into the database
-    try {
-      final pictureId = await pictureHelper.insertPicture(picture);
-      print('Picture inserted successfully with ID: $pictureId');
-    } catch (e) {
-      print('Error inserting picture: $e');
-    }
-  }
-
-
-
-
-
-
-
-
-
 
   Future<void> loadAllMissions() async {
     try {
@@ -177,9 +220,7 @@ class MissionBrain {
   // Retrieve all babies linked to the logged-in user
   Future<List<BabyModel>> getBabiesForUser() async {
     // Retrieve the logged-in user's ID from the UserSession
-    //final userId = UserSession().userId;
-
-    final userId = 1; // This should be replaced with UserSession().userId when implementing real user session logic
+    final userId = UserSession().userId;
 
     if (userId == null) {
       print("[getBabiesForUser] No user is logged in.");
