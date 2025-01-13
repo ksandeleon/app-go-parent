@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
 import 'package:go_parent/services/database/firebase_options.dart';
 import 'package:go_parent/screens/login_page/login_screen.dart';
 import 'package:go_parent/screens/login_page/password_recovery_screen.dart';
@@ -66,13 +67,13 @@ class MyApp extends StatelessWidget {
 
       initialRoute: 'welcome_screen',
       routes: {
-        // GalleryScreen.id: (context) => GalleryScreen(),
         WelcomeScreen.id: (context) => WelcomeScreen(), // welcome_screen
         LoginPage.id: (context) => LoginPage(), //id = "login_screen"
         Signup.id: (context) => Signup(), //id = "signup_screen""
         Homescreen.id: (context) => Homescreen(username: 'some_username'),// home_screen
-        PasswordRecovery.id: (context) => PasswordRecovery(), //password_recovery_screen
+        // PasswordRecovery.id: (context) => PasswordRecovery(), //password_recovery_screen
         MissionScreen.id: (context) => MissionScreen(), //mission_screen
+        GalleryScreen.id: (context) => GalleryScreen(), //gallery_screen
       },
     );
   }

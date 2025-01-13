@@ -123,7 +123,6 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
 
-
   Future<void> _loadMissions() async {
     setState(() {
       _isLoading = true;
@@ -172,6 +171,8 @@ class _MissionScreenState extends State<MissionScreen> {
                 ),
               ),
 
+              ElevatedButton(onPressed: () => Navigator.pushReplacementNamed(context, "gallery_screen"), child: Text("go to gallery")),
+
               Expanded(
                 child: _missions.isEmpty
                   ? Center(
@@ -187,73 +188,72 @@ class _MissionScreenState extends State<MissionScreen> {
 
                   :
 
-
                   ListView.builder(
-  itemCount: _missions.length,
-  itemBuilder: (context, index) {
-    final missionWithStatus = _missions[index];
-    final mission = missionWithStatus.mission;
+                    itemCount: _missions.length,
+                    itemBuilder: (context, index) {
+                      final missionWithStatus = _missions[index];
+                      final mission = missionWithStatus.mission;
 
-    return Card(
-      elevation: 6,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
-      margin: const EdgeInsets.all(10.0),
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              title: Text(
-                mission.title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                ),
-              ),
-              subtitle: Text(
-                mission.content,
-                style: const TextStyle(
-                  color: Colors.black87,
-                  fontSize: 16,
-                ),
-              ),
-              trailing: Icon(
-                missionWithStatus.isCompleted
-                    ? Icons.check_circle
-                    : Icons.circle_outlined,
-                color: missionWithStatus.isCompleted
-                    ? Colors.green
-                    : Colors.grey,
-              ),
-            ),
-            if (!missionWithStatus.isCompleted) ...[
-              const SizedBox(width: 10),
-              ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.teal,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                      return Card(
+                        elevation: 6,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        margin: const EdgeInsets.all(10.0),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              ListTile(
+                                title: Text(
+                                  mission.title,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  mission.content,
+                                  style: const TextStyle(
+                                    color: Colors.black87,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                trailing: Icon(
+                                  missionWithStatus.isCompleted
+                                      ? Icons.check_circle
+                                      : Icons.circle_outlined,
+                                  color: missionWithStatus.isCompleted
+                                      ? Colors.green
+                                      : Colors.grey,
+                                ),
+                              ),
+                              if (!missionWithStatus.isCompleted) ...[
+                                const SizedBox(width: 10),
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.teal,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: () async {
+                                    if (mission.missionId != null) {
+                                      await _missionBrain.completeMissionWithPhoto(mission.missionId!);
+                                      await _fetchMissions(); // Refresh the list
+                                    }
+                                  },
+                                  icon: const Icon(Icons.camera_alt, color: Colors.white),
+                                  label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                ),
-                onPressed: () async {
-                  if (mission.missionId != null) {
-                    await _missionBrain.completeMissionWithPhoto(mission.missionId!);
-                    await _fetchMissions(); // Refresh the list
-                  }
-                },
-                icon: const Icon(Icons.camera_alt, color: Colors.white),
-                label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  },
-)
 
               ),
             ],
