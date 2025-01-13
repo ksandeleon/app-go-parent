@@ -158,8 +158,6 @@ class _MissionScreenState extends State<MissionScreen> {
         : Column(
             children: [
 
-              ElevatedButton(onPressed: () => Navigator.pushReplacementNamed(context, "gallery_screen"), child: Text("go to gallery")),
-
               Expanded(
                 child: DefaultTabController(
                   length: 1,
@@ -173,9 +171,9 @@ class _MissionScreenState extends State<MissionScreen> {
                       bottom: const TabBar(
                         tabs: [
                           Tab(text: 'All Missions', ),
-                          Tab(text: 'Social Missions', ),
-                          Tab(text: 'Creative Missions', ),
-                          Tab(text: 'Physical Missions', ),
+                          // Tab(text: 'Social Missions', ),
+                          // Tab(text: 'Creative Missions', ),
+                          // Tab(text: 'Physical Missions', ),
                         ],
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.white,
@@ -246,7 +244,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                                     fontSize: 18,
                                                   ),
                                                 ),
-                                                
+
                                                 subtitle: Text(
                                                   mission.content,
                                                   style: const TextStyle(

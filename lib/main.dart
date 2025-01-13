@@ -68,9 +68,9 @@ class MyApp extends StatelessWidget {
       initialRoute: 'welcome_screen',
       routes: {
         WelcomeScreen.id: (context) => WelcomeScreen(), // welcome_screen
-        LoginPage.id: (context) => LoginPage(), //id = "login_screen"
+        LoginPage1.id: (context) => LoginPage1(), //id = "login_screen"
         Signup.id: (context) => Signup(), //id = "signup_screen""
-        Homescreen.id: (context) => Homescreen(username: 'some_username'),// home_screen
+        // Homescreen.id: (context) => Homescreen(username: 'some_username'),// home_screen
         // PasswordRecovery.id: (context) => PasswordRecovery(), //password_recovery_screen
         MissionScreen.id: (context) => MissionScreen(), //mission_screen
         GalleryScreen.id: (context) => GalleryScreen(), //gallery_screen

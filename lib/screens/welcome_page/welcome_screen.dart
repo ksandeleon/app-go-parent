@@ -164,8 +164,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                     const SizedBox(height: 20),
                     TextButton(
                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => LoginPage()));
+                        Navigator.pushReplacementNamed(context, "login_screen") ;
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Color(0xFF009688), // Teal text color

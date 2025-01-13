@@ -71,7 +71,7 @@ class SideMenu extends StatelessWidget {
                 // Navigate to the login page after logout
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
+                    builder: (context) => const LoginPage1(),
                   ),
                 );
               },
