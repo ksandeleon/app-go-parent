@@ -276,7 +276,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                                     ),
                                                     onPressed: () async {
                                                       if (mission.missionId != null) {
-                                                        await _missionBrain.completeMissionWithPhoto(mission.missionId!);
+                                                        await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
                                                         await _fetchMissions();
                                                       }
                                                     },
@@ -298,7 +298,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                                     ),
                                                     onPressed: () async {
                                                       if (mission.missionId != null) {
-                                                        await _missionBrain.completeMissionWithPhoto(mission.missionId!);
+                                                        await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
                                                         await _fetchMissions();
                                                       }
                                                     },

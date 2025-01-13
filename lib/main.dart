@@ -19,6 +19,7 @@ import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:path/path.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'screens/welcome_page/splash_screen.dart';
+import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'screens/mission_page/mission_screen.dart';
 
 void main() async {

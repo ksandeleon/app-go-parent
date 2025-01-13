@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
@@ -7,6 +8,8 @@ import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+
 
 class MissionBrain {
   final MissionHelper missionHelper;
@@ -70,21 +73,50 @@ class MissionBrain {
   }
 
   Future<bool> completeMissionWithPhoto(
+    BuildContext context,
     int missionId,
     {bool isCollage = false}
   ) async {
     // Retrieve the logged-in user's ID from the UserSession singleton
     final userId = UserSession().userId;
-
     // Check if user is logged in
     if (userId == null) {
+      await Alert(
+        context: context,
+        type: AlertType.error,
+        title: "Login Required",
+        desc: "Please log in to complete this mission.",
+        buttons: [
+          DialogButton(
+            child: const Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ).show();
       print("No user is logged in.");
       return false;
     }
 
     String? photoPath = await takePhotoOrPickFile();
-
     if (!validatePhotoSelection(photoPath)) {
+      await Alert(
+        context: context,
+        type: AlertType.warning,
+        title: "Submission Cancelled",
+        desc: "Please select or take a photo to submit on this  mission.",
+        buttons: [
+          DialogButton(
+            child: const Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ).show();
       print("No photo selected");
       return false;
     }
@@ -95,12 +127,42 @@ class MissionBrain {
       // First complete the mission
       final completed = await completeMission(userId, missionId);
       if (!completed) {
+        await Alert(
+          context: context,
+          type: AlertType.error,
+          title: "Mission Error",
+          desc: "Failed to complete the mission. Please try again.",
+          buttons: [
+            DialogButton(
+              child: const Text(
+                "OK",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ).show();
         return false;
       }
 
       // Get the userMissionId
       final userMissionId = await getUserMissionId(userId, missionId);
       if (userMissionId == null) {
+        await Alert(
+          context: context,
+          type: AlertType.error,
+          title: "Mission ID Error",
+          desc: "Could not retrieve mission information. Please try again.",
+          buttons: [
+            DialogButton(
+              child: const Text(
+                "OK",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ).show();
         return false;
       }
 
@@ -112,9 +174,60 @@ class MissionBrain {
         isCollage: isCollage
       );
 
-      return photoId != null;
+      if (photoId == null) {
+        await Alert(
+          context: context,
+          type: AlertType.error,
+          title: "Photo Save Error",
+          desc: "Failed to save the photo. Please try again.",
+          buttons: [
+            DialogButton(
+              child: const Text(
+                "OK",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
+        ).show();
+        return false;
+      }
+
+      // Show success message
+      await Alert(
+        context: context,
+        type: AlertType.success,
+        title: "Submission Success!",
+        desc: "Submission has been completed with your photo.",
+        buttons: [
+          DialogButton(
+            child: const Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ).show();
+
+      return true;
     } catch (e) {
       print('Error in completeMissionWithPhoto: $e');
+      await Alert(
+        context: context,
+        type: AlertType.error,
+        title: "Unexpected Error",
+        desc: "An unexpected error occurred. Please try again.",
+        buttons: [
+          DialogButton(
+            child: const Text(
+              "OK",
+              style: TextStyle(color: Colors.white, fontSize: 20),
+            ),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ).show();
       return false;
     }
   }
