@@ -34,7 +34,7 @@ class _LogoutState extends State<Logout> {
   }
 
   void _loadUser() async {
-    final db = await openDatabase('goparent.db');
+    final db = await openDatabase('goparent_v5.db');
     _userHelper = UserHelper(db);
     final userId = 1;
     final user = await _userHelper.getUserById(userId);

@@ -28,7 +28,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     _initializeGalleryBrain();
   }
 
-
   Future<void> _initializeGalleryBrain() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -38,7 +37,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
     galleryBrain = GalleryBrain(pictureHelper);
     await _loadPictures();
   }
-
 
   Future<void> _loadPictures() async {
     try {
@@ -54,7 +52,6 @@ class _GalleryScreenState extends State<GalleryScreen> {
       debugPrint('Error loading pictures: $e');
     }
   }
-
 
   String _formatDate(DateTime? date) {
     if (date == null) return 'No date';
@@ -73,92 +70,154 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gallery'),
-      ),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(8),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 8,
-          childAspectRatio: 0.8,
+        elevation: 8,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.teal,
+        title: const Text(
+          'Go Gallery',
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        itemCount: pictures.length,
-        itemBuilder: (context, index) {
-          final picture = pictures[index];
-          // Create a unique tag using the picture ID
-          final heroTag = 'picture_${picture.pictureId}';
+        actions: [
+          Tooltip(
+            message: 'Refresh gallery',
+            child: IconButton(
+              icon: const Icon(Icons.refresh, color: Colors.white),
+              onPressed: _loadPictures,
+            ),
+          ),
+        ],
+      ),
+      body: DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          appBar: AppBar(
+            backgroundColor: Colors.white38,
+            elevation: 0,
+            bottom: const TabBar(
+              indicatorColor: Colors.black,
+              labelColor: Colors.black,
+              unselectedLabelColor: Colors.black54,
+              tabs: [
+                Tab(text: 'Joyful Pictures', icon: Icon(Icons.image)),
+                Tab(text: 'Memory Collage', icon: Icon(Icons.grid_on)),
+              ],
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              GridView.builder(
+                padding: const EdgeInsets.all(8),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  crossAxisSpacing: 8,
+                  mainAxisSpacing: 8,
+                  childAspectRatio: 0.8,
+                ),
+                itemCount: pictures.length,
+                itemBuilder: (context, index) {
+                  final picture = pictures[index];
+                  final heroTag = 'picture_${picture.pictureId}';
 
-          return Card(
-            clipBehavior: Clip.antiAlias,
-            elevation: 2,
-            child: InkWell(
-              onTap: () => _showFullScreenImage(context, picture, heroTag),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: Hero(
-                      tag: heroTag,
-                      child: Image.file(
-                        File(picture.photoPath),
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Container(
-                            color: Colors.grey[300],
-                            child: const Icon(Icons.error),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Icon(
-                              picture.isCollage
-                                  ? Icons.grid_on
-                                  : Icons.image,
-                              size: 16,
-                              color: Colors.grey[600],
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              picture.isCollage ? 'Collage' : 'Single Image',
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
+                  return Card(
+                    clipBehavior: Clip.antiAlias,
+                    elevation: 2,
+                    child: InkWell(
+                      onTap: () => _showFullScreenImage(context, picture, heroTag),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: Hero(
+                              tag: heroTag,
+                              child: Image.file(
+                                File(picture.photoPath),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.error),
+                                  );
+                                },
                               ),
                             ),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _formatDate(picture.createdAt),
-                          style: TextStyle(
-                            color: Colors.grey[800],
-                            fontSize: 12,
                           ),
-                        ),
-                        Text(
-                          'Mission ID: ${picture.userMissionId}',
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                            fontSize: 11,
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      picture.isCollage ? Icons.grid_on : Icons.image,
+                                      size: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      picture.isCollage ? 'Collage' : 'Single Image',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatDate(picture.createdAt),
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  'Mission ID: ${picture.userMissionId}',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              //secondpage here
+              Stack(
+                children: [
+                  const Center(child: Text('You have no collage yet..')),
+
+                  //FAB HERE
+                  Positioned(
+                    right: 32,
+                    bottom: 32,
+                    child: Tooltip(
+                      message: "Create a new collage",
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.teal,
+                        onPressed: () {
+
+                        },
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.white,
                         ),
-                      ],
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-          );
-        },
+
+            ],
+          ),
+        ),
       ),
     );
   }

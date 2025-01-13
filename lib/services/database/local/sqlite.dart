@@ -143,6 +143,19 @@ class DatabaseService {
       )
     ''');
 
+    // notes with full-text search capability
+    await db.execute('''
+      CREATE TABLE notesdb (
+        noteId INTEGER PRIMARY KEY AUTOINCREMENT,
+        userId INTEGER NOT NULL,
+        title TEXT NOT NULL,
+        content TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (userId) REFERENCES userdb(userId) ON DELETE CASCADE
+      )
+    ''');
+
 //../commented for now--focus on core functionalities
 //     // logs ../unsure about the schema of this.
 //     await db.execute('''

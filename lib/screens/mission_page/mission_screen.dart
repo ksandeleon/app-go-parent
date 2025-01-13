@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_parent/Screen/prototypeMissionGraph.dart';
+import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
@@ -302,7 +303,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                                       }
                                                     },
                                                     icon: const Icon(Icons.camera_alt, color: Colors.teal),
-                                                    label: const Text('Add Photo', style: TextStyle(color: Colors.teal)),
+                                                    label: const Text('Submit Another', style: TextStyle(color: Colors.teal)),
                                                   ),
                                                 ),
                                               ],
