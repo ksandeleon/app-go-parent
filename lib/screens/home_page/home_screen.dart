@@ -46,12 +46,12 @@ class _HomescreenState extends State<Homescreen> {
             ]),
       ),
 
-      appBar: AppBar(title: Text("Home")),
+    //  appBar: AppBar(title: Text("Home")),
       drawer: SideMenu(username: widget.username),
       body: Obx(() {
         return IndexedStack(
-          index: cont.selectedIndex.value, // Maintain the selected index
-          children: cont.screens, // The screens to display
+          index: cont.selectedIndex.value,
+          children: cont.screens,
         );
       }),
     );
@@ -63,8 +63,8 @@ class NavigationController extends GetxController {
 
   final screens = [
     const Logout(),
-    MissionScreen(), // This will display the mission screen
-    MissionProgressGraph( missionPoints: [50, 90, 130, 160, 200],), // Dashboard widget for mission data
+    MissionScreen(),
+    MissionProgressGraph( missionPoints: [50, 90, 130, 160, 200],),
     Container(
       color: Colors.red,
     )

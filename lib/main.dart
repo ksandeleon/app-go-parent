@@ -74,6 +74,7 @@ class MyApp extends StatelessWidget {
         // PasswordRecovery.id: (context) => PasswordRecovery(), //password_recovery_screen
         MissionScreen.id: (context) => MissionScreen(), //mission_screen
         GalleryScreen.id: (context) => GalleryScreen(), //gallery_screen
+        // CollageScreen.id:
       },
     );
   }

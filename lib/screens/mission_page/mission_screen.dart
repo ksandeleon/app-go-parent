@@ -11,6 +11,14 @@ import 'package:go_parent/utilities/user_session.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:go_parent/screens/mission_page/mission_brain.dart';
 
+  enum MissionCategory {
+  Social,
+  Creative,
+  Physical,
+  Developmental,
+}
+
+
 class MissionScreen extends StatefulWidget {
   const MissionScreen({super.key});
   static String id = "mission_screen";
@@ -20,17 +28,17 @@ class MissionScreen extends StatefulWidget {
 }
 
 class _MissionScreenState extends State<MissionScreen> {
+  late MissionBrain _missionBrain;
+
+  bool _isLoading = true;
   double progress = 0;
   int totalPoints = 0;
 
-  List<DropdownMenuEntry<int>> dropdownItems = [];
   int? _selectedBabyAge;
-  List<MissionWithStatus> _missions = [];
-  late MissionBrain _missionBrain;
-  bool _isLoading = true;
   String? photoPath;
 
-
+  List<DropdownMenuEntry<int>> dropdownItems = [];
+  List<MissionWithStatus> _missions = [];
 
   @override
   void initState() {
@@ -47,8 +55,8 @@ class _MissionScreenState extends State<MissionScreen> {
     final db = await dbService.database;
 
     final missionHelper = MissionHelper(db);
-    final babyHelper = BabyHelper(db);
     final pictureHelper = PictureHelper(db);
+    final babyHelper = BabyHelper(db);
     final userMissionHelper = UserMissionHelper();
 
     _missionBrain = MissionBrain(missionHelper, babyHelper, pictureHelper, userMissionHelper);
@@ -60,6 +68,7 @@ class _MissionScreenState extends State<MissionScreen> {
 
   Future<void> _fetchBabiesAndSetupDropdown() async {
     setState(() => _isLoading = true);
+
     try {
       List<BabyModel> babies = await _missionBrain.getBabiesForUser();
       if (babies.isEmpty) {
@@ -141,119 +150,182 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
 
-  // void _completeMission(int missionIndex) {
-  //   setState(() {
-  //     _missionCompleted[missionIndex] = true;
-  //     _missions[missionIndex]['isCompleted'] = true;
-  //   });
-  // }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Go Missions'),
-        backgroundColor: Colors.teal,
-      ),
       body: _isLoading
         ? Center(child: CircularProgressIndicator())
         : Column(
             children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: DropdownMenu<int>(
-                  dropdownMenuEntries: dropdownItems,
-                  initialSelection: _selectedBabyAge,
-                  onSelected: (int? age) async {
-                    setState(() => _selectedBabyAge = age);
-                    await _fetchMissions();
-                  },
-                ),
-              ),
 
               ElevatedButton(onPressed: () => Navigator.pushReplacementNamed(context, "gallery_screen"), child: Text("go to gallery")),
 
               Expanded(
-                child: _missions.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.inbox, size: 64, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          const Text('No missions available', style: TextStyle(fontSize: 18)),
+                child: DefaultTabController(
+                  length: 1,
+                  child: Scaffold(
+                    backgroundColor: Colors.grey[200],
+                    appBar: AppBar(
+                      elevation: 8,
+                      automaticallyImplyLeading: false,
+                      backgroundColor: Colors.teal,
+                      title: const Text('Go Missions', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
+                      bottom: const TabBar(
+                        tabs: [
+                          Tab(text: 'All Missions', ),
+                          Tab(text: 'Social Missions', ),
+                          Tab(text: 'Creative Missions', ),
+                          Tab(text: 'Physical Missions', ),
                         ],
+                        labelColor: Colors.white,
+                        unselectedLabelColor: Colors.white,
                       ),
-                    )
+                      actions: [
 
-                  :
-
-                  ListView.builder(
-                    itemCount: _missions.length,
-                    itemBuilder: (context, index) {
-                      final missionWithStatus = _missions[index];
-                      final mission = missionWithStatus.mission;
-
-                      return Card(
-                        elevation: 6,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        margin: const EdgeInsets.all(10.0),
-                        child: Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              ListTile(
-                                title: Text(
-                                  mission.title,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
-                                  ),
-                                ),
-                                subtitle: Text(
-                                  mission.content,
-                                  style: const TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                trailing: Icon(
-                                  missionWithStatus.isCompleted
-                                      ? Icons.check_circle
-                                      : Icons.circle_outlined,
-                                  color: missionWithStatus.isCompleted
-                                      ? Colors.green
-                                      : Colors.grey,
-                                ),
-                              ),
-                              if (!missionWithStatus.isCompleted) ...[
-                                const SizedBox(width: 10),
-                                ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.teal,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  onPressed: () async {
-                                    if (mission.missionId != null) {
-                                      await _missionBrain.completeMissionWithPhoto(mission.missionId!);
-                                      await _fetchMissions(); // Refresh the list
-                                    }
-                                  },
-                                  icon: const Icon(Icons.camera_alt, color: Colors.white),
-                                  label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
-                                ),
-                              ],
-                            ],
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
+                          child: SizedBox(
+                            width: 200,
+                            child: DropdownButton<int>(
+                              dropdownColor: Colors.teal,
+                              value: _selectedBabyAge,
+                              items: dropdownItems
+                                  .map((item) => DropdownMenuItem<int>(
+                                        value: item.value,
+                                        child: Text(
+                                          item.label,
+                                          style: const TextStyle(color: Colors.white),
+                                        ),
+                                      ))
+                                  .toList(),
+                              onChanged: (int? age) async {
+                                setState(() => _selectedBabyAge = age);
+                                await _fetchMissions();
+                              },
+                              style: const TextStyle(color: Colors.white),
+                              iconEnabledColor: Colors.white,
+                            ),
                           ),
                         ),
-                      );
-                    },
-                  ),
+
+
+                      ],
+                    ),
+                    body: _isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : TabBarView(
+                        children: [
+                          Column(
+                            children: [
+
+
+                              Expanded(
+                                child: ListView.builder(
+                                    itemCount: _missions.length,
+                                    itemBuilder: (context, index) {
+                                      final missionWithStatus = _missions[index];
+                                      final mission = missionWithStatus.mission;
+
+                                      return Card(
+                                        elevation: 6,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(20),
+                                        ),
+                                        margin: const EdgeInsets.all(10.0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+
+                                              ListTile(
+                                                title: Text(
+                                                  mission.title,
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                                
+                                                subtitle: Text(
+                                                  mission.content,
+                                                  style: const TextStyle(
+                                                    color: Colors.black87,
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                                trailing: Icon(
+                                                  missionWithStatus.isCompleted
+                                                      ? Icons.check_circle
+                                                      : Icons.circle_outlined,
+                                                  color: missionWithStatus.isCompleted
+                                                      ? Colors.green
+                                                      : Colors.grey,
+                                                ),
+                                              ),
+
+                                              if (!missionWithStatus.isCompleted) ...[
+                                                const SizedBox(width: 10),
+                                                SizedBox(
+                                                  width: 180,
+                                                  child: ElevatedButton.icon(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.teal,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                    ),
+                                                    onPressed: () async {
+                                                      if (mission.missionId != null) {
+                                                        await _missionBrain.completeMissionWithPhoto(mission.missionId!);
+                                                        await _fetchMissions();
+                                                      }
+                                                    },
+                                                    icon: const Icon(Icons.camera_alt, color: Colors.white),
+                                                    label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
+                                                  ),
+                                                )
+
+                                              ] else ...[
+                                                const SizedBox(width: 10),
+                                                SizedBox(
+                                                  width: 180,
+                                                  child: ElevatedButton.icon(
+                                                    style: ElevatedButton.styleFrom(
+                                                      backgroundColor: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(10),
+                                                      ),
+                                                    ),
+                                                    onPressed: () async {
+                                                      if (mission.missionId != null) {
+                                                        await _missionBrain.completeMissionWithPhoto(mission.missionId!);
+                                                        await _fetchMissions();
+                                                      }
+                                                    },
+                                                    icon: const Icon(Icons.camera_alt, color: Colors.teal),
+                                                    label: const Text('Add Photo', style: TextStyle(color: Colors.teal)),
+                                                  ),
+                                                ),
+                                              ],
+
+                                            ],
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+
+                            ],
+                          ),
+                        ],
+                      ),
+                ),
+              ),
+
+
+
 
               ),
             ],
