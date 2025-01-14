@@ -34,21 +34,20 @@ void main() async {
   await deleteDatabase(join(await getDatabasesPath(), 'goparent_v2.db'));
   await deleteDatabase(join(await getDatabasesPath(), 'goparent_v3.db'));
 
-
   await DatabaseService.instance.database;
 
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.black));
 
-  doWhenWindowReady(() {
-    final win = appWindow;
-    const desktopSize = Size(1200, 900);
-    win.alignment = Alignment.center;
-    win.size = desktopSize;
-    win.minSize = desktopSize;
-    win.maxSize = desktopSize;
-    win.show();
-  });
+  // doWhenWindowReady(() {
+  //   final win = appWindow;
+  //   const desktopSize = Size(1200, 900);
+  //   win.alignment = Alignment.center;
+  //   win.size = desktopSize;
+  //   win.minSize = desktopSize;
+  //   win.maxSize = desktopSize;
+  //   win.show();
+  // });
 
   runApp(const MyApp());
 }

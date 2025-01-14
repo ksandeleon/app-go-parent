@@ -12,6 +12,7 @@ import 'package:go_parent/services/database/local/models/pictures_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -335,6 +336,38 @@ class _GalleryScreenState extends State<GalleryScreen> {
 
               //secondpage here <= place to operate collages
               const Center(child: Text('You have no collage yet..')),
+   //           StaggeredGrid.count(
+//   crossAxisCount: 4,
+//   mainAxisSpacing: 4,
+//   crossAxisSpacing: 4,
+//   children: const [
+//     StaggeredGridTile.count(
+//       crossAxisCellCount: 2,
+//       mainAxisCellCount: 2,
+//       child: Tile(index: 0),
+//     ),
+//     StaggeredGridTile.count(
+//       crossAxisCellCount: 2,
+//       mainAxisCellCount: 1,
+//       child: Tile(index: 1),
+//     ),
+//     StaggeredGridTile.count(
+//       crossAxisCellCount: 1,
+//       mainAxisCellCount: 1,
+//       child: Tile(index: 2),
+//     ),
+//     StaggeredGridTile.count(
+//       crossAxisCellCount: 1,
+//       mainAxisCellCount: 1,
+//       child: Tile(index: 3),
+//     ),
+//     StaggeredGridTile.count(
+//       crossAxisCellCount: 4,
+//       mainAxisCellCount: 2,
+//       child: Tile(index: 4),
+//     ),
+//   ],
+// );
 
     //         ListView.builder(
     // itemCount: collages.length,
