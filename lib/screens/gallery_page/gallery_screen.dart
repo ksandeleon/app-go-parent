@@ -219,121 +219,87 @@ class _GalleryScreenState extends State<GalleryScreen> {
           ),
           body: TabBarView(
             children: [
-              Stack(
-                children: [
-
-                  GridView.builder(
-                  padding: const EdgeInsets.all(8),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    childAspectRatio: 0.8,
-                  ),
-                  itemCount: pictures.length,
-                  itemBuilder: (context, index) {
-                    final picture = pictures[index];
-                    final heroTag = 'picture_${picture.pictureId}';
-
-                    return Card(
-                      clipBehavior: Clip.antiAlias,
-                      elevation: 2,
-                      child: InkWell(
-                        onTap: () => _showFullScreenImage(context, picture, heroTag),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Expanded(
-                              child: Hero(
-                                tag: heroTag,
-                                child: Image.file(
-                                  File(picture.photoPath),
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) {
-                                    return Container(
-                                      color: Colors.grey[300],
-                                      child: const Icon(Icons.error),
-                                    );
-                                  },
-                                ),
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.all(8),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        picture.isCollage ? Icons.grid_on : Icons.image,
-                                        size: 16,
-                                        color: Colors.grey[600],
-                                      ),
-                                      const SizedBox(width: 4),
-                                      Text(
-                                        picture.isCollage ? 'Collage' : 'Single Image',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    _formatDate(picture.createdAt),
-                                    style: TextStyle(
-                                      color: Colors.grey[800],
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Mission ID: ${picture.userMissionId}',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontSize: 11,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+              GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 4,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+                childAspectRatio: 0.8,
                 ),
+                itemCount: pictures.length,
+                itemBuilder: (context, index) {
+                  final picture = pictures[index];
+                  final heroTag = 'picture_${picture.pictureId}';
 
-                Positioned(
-                    right: 32,
-                    bottom: 32,
-                    child: Tooltip(
-                      message: "Create a new collage",
-                      child: FloatingActionButton(
-                        backgroundColor: Colors.teal,
-                        onPressed: () {
-                          if (isSelectMode) {
-                            if (selectedPictureIds.isNotEmpty) {
-                              _createCollage();
-                            }
-                          } else {
-                            setState(() {
-                              isSelectMode = true;
-                            });
-                          }
-                        },
-
-
-                        child: const Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
+                  return Card(
+                    clipBehavior: Clip.antiAlias,
+                    elevation: 2,
+                    child: InkWell(
+                      onTap: () => _showFullScreenImage(context, picture, heroTag),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: Hero(
+                              tag: heroTag,
+                              child: Image.file(
+                                File(picture.photoPath),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.error),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Icon(
+                                      picture.isCollage ? Icons.grid_on : Icons.image,
+                                      size: 16,
+                                      color: Colors.grey[600],
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      picture.isCollage ? 'Collage' : 'Single Image',
+                                      style: TextStyle(
+                                        color: Colors.grey[600],
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _formatDate(picture.createdAt),
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                Text(
+                                  'Mission ID: ${picture.userMissionId}',
+                                  style: TextStyle(
+                                    color: Colors.grey[600],
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-
-                ],
+                  );
+                },
               ),
 
               //secondpage here <= place to operate collages

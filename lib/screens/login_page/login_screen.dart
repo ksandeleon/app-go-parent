@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 // import 'package:go_parent/Screen/dashboard.dart';
 import 'package:go_parent/screens/home_page/home_screen.dart';
+import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/helpers/user_helper.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/screens/login_page/login_brain.dart';
@@ -52,7 +53,8 @@ Future<void> _initializeLoginBrain() async {
   final dbService = DatabaseService.instance;
   final db = await dbService.database;
   final userHelper = UserHelper(db);
-  loginBrain = LoginBrain(userHelper);
+  final missionHelper = MissionHelper(db);
+  loginBrain = LoginBrain(userHelper, missionHelper);
 }
   void handleLogin(BuildContext context) async {
     setState(() => isLoading = true);

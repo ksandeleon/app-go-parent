@@ -155,3 +155,31 @@ class _CollageScreenState extends State<CollageScreen> {
     // },
     //         ),
 
+
+
+
+                // Positioned(
+                //     right: 32,
+                //     bottom: 32,
+                //     child: Tooltip(
+                //       message: "Create a new collage",
+                //       child: FloatingActionButton(
+                //         backgroundColor: Colors.teal,
+                //         onPressed: () {
+                //           if (isSelectMode) {
+                //             if (selectedPictureIds.isNotEmpty) {
+                //               _createCollage();
+                //             }
+                //           } else {
+                //             setState(() {
+                //               isSelectMode = true;
+                //             });
+                //           }
+                //         },
+                //         child: const Icon(
+                //           Icons.add,
+                //           color: Colors.white,
+                //         ),
+                //       ),
+                //     ),
+                //   ),
