@@ -67,7 +67,7 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
 
-  Future<void> _fetchBabiesAndSetupDropdown() async {
+   Future<void> _fetchBabiesAndSetupDropdown() async {
     setState(() => _isLoading = true);
 
     try {
@@ -76,6 +76,7 @@ class _MissionScreenState extends State<MissionScreen> {
         print("No babies found for user");
         setState(() {
           dropdownItems = [];
+          _selectedBabyAge = null;  // Reset selected age when no babies
           _isLoading = false;
         });
         return;
@@ -122,15 +123,17 @@ class _MissionScreenState extends State<MissionScreen> {
         )
       ).toList();
 
-      setState(() {
-        _missions = missionsWithStatus;
-      });
-    } catch (e) {
-      print('Error fetching missions: $e');
-    } finally {
-      setState(() => _isLoading = false);
+        setState(() {
+          _missions = missionsWithStatus;
+        });
+      } catch (e) {
+        print('Error fetching missions: $e');
+      } finally {
+        setState(() => _isLoading = false);
+      }
     }
-  }
+
+  
 
 
   Future<void> _loadMissions() async {
@@ -149,6 +152,10 @@ class _MissionScreenState extends State<MissionScreen> {
       _isLoading = false;
     });
   }
+
+ 
+ 
+
 
 
   @override
