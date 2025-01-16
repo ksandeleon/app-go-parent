@@ -123,7 +123,7 @@ class _MissionScreenState extends State<MissionScreen> {
         )
       ).toList();
  
- 
+
         setState(() {
           _missions = missionsWithStatus;
         });
@@ -134,6 +134,12 @@ class _MissionScreenState extends State<MissionScreen> {
       }
     }
 
+  Future<void> _refreshBabiesList() async {
+    setState(() => _isLoading = true);
+    await _fetchBabiesAndSetupDropdown();
+    await _fetchMissions();
+    setState(() => _isLoading = false);
+  }
   
 
 
@@ -186,7 +192,13 @@ class _MissionScreenState extends State<MissionScreen> {
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.white,
                       ),
+
                       actions: [
+                        IconButton(
+                          icon: const Icon(Icons.refresh, color: Colors.white),
+                          onPressed: _refreshBabiesList,
+                          tooltip: 'Refresh babies list',
+                        ),
 
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
