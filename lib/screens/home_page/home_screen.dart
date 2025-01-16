@@ -42,7 +42,7 @@ class _HomescreenState extends State<Homescreen> {
             height: 80,
             elevation: 0,
             selectedIndex: cont.selectedIndex.value,
-            onDestinationSelected: (index) => cont.selectedIndex.value = index,
+            onDestinationSelected: (index) => cont.onDestinationSelected(index),
             destinations: const [
               NavigationDestination(icon: Icon(Icons.home), label: "Home"),
               NavigationDestination(icon: Icon(Icons.task_rounded), label: "Missions"),
@@ -50,7 +50,6 @@ class _HomescreenState extends State<Homescreen> {
               NavigationDestination(icon: Icon(Icons.person_2_rounded), label: "Profile"),
 
             ]),
-
       ),
 
       // // AppBar
@@ -70,28 +69,47 @@ class _HomescreenState extends State<Homescreen> {
   }
 }
 
-// Screen Navigator
+
 class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
   final String username;
   final int userId;
-
   NavigationController({required this.username, required this.userId});
-
   late final List<Widget> screens;
+
+  void onDestinationSelected(int index) {
+    selectedIndex.value = index;
+    // Refresh the selected screen by recreating it with a new key
+    screens[index] = _getScreen(index);
+  }
+
+  Widget _getScreen(int index) {
+    switch (index) {
+      case 0:
+        return Logout(username: username, userId: userId, key: UniqueKey());
+      case 1:
+        return MissionScreen(key: UniqueKey());
+      case 2:
+        return GalleryScreen(key: UniqueKey());
+      case 3:
+        return profileviewer(key: UniqueKey());
+      default:
+        return Logout(username: username, userId: userId, key: UniqueKey());
+    }
+  }
 
   @override
   void onInit() {
     super.onInit();
     screens = [
-      Logout(username: username, userId: userId),
-      MissionScreen(),
-      GalleryScreen(),
-      profileviewer(),
-
+      _getScreen(0),
+      _getScreen(1),
+      _getScreen(2),
+      _getScreen(3),
     ];
   }
 }
+
 
 
 // Dashboard widget for Missions
