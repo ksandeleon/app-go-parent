@@ -122,7 +122,8 @@ class _MissionScreenState extends State<MissionScreen> {
           isCompleted: completedMissions.contains(mission.missionId)
         )
       ).toList();
-
+ 
+ 
         setState(() {
           _missions = missionsWithStatus;
         });
@@ -153,7 +154,6 @@ class _MissionScreenState extends State<MissionScreen> {
     });
   }
 
- 
  
 
 
