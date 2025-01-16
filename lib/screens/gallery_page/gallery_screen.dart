@@ -26,7 +26,7 @@ class GalleryScreen extends StatefulWidget {
 
 class _GalleryScreenState extends State<GalleryScreen> {
   final userId = UserSession().userId;
-  late final GalleryBrain galleryBrain;
+  late  GalleryBrain galleryBrain;
   List<PictureModel> pictures = [];
   List<CollageModel> collages = [];
 
@@ -37,8 +37,10 @@ class _GalleryScreenState extends State<GalleryScreen> {
   @override
   void initState() {
     super.initState();
-    _initializeGalleryBrain();
-    _loadCollages();
+    _initializeGalleryBrain().then((_) {
+     _loadCollages();
+    });
+    
 
     //final collageScreen = CollageScreen();
 
@@ -72,16 +74,17 @@ class _GalleryScreenState extends State<GalleryScreen> {
   }
 
   void _loadCollages() async {
-    setState(() {
-      isLoading = true;
-    });
+  setState(() {
+    isLoading = true;
+  });
 
-    final retrievedCollages = await context.read<CollageHelper>().getAllCollages();
-    setState(() {
-      collages = retrievedCollages;
-      isLoading = false;
-    });
-  }
+  // Use galleryBrain.collageHelper instead of context.read
+  final retrievedCollages = await galleryBrain.collageHelper.getAllCollages();
+  setState(() {
+    collages = retrievedCollages;
+    isLoading = false;
+  });
+}
 
   String _formatDate(DateTime? date) {
     if (date == null) return 'No date';

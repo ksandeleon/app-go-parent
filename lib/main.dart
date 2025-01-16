@@ -66,7 +66,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      initialRoute: 'gallery_screen', 
+      initialRoute: 'welcome_screen', 
       routes: {
         WelcomeScreen.id: (context) => WelcomeScreen(), // welcome_screen
         LoginPage1.id: (context) => LoginPage1(), //id = "login_screen"
