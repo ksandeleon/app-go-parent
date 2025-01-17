@@ -67,7 +67,7 @@ class _MissionScreenState extends State<MissionScreen> {
   }
 
 
-  Future<void> _fetchBabiesAndSetupDropdown() async {
+   Future<void> _fetchBabiesAndSetupDropdown() async {
     setState(() => _isLoading = true);
 
     try {
@@ -76,6 +76,7 @@ class _MissionScreenState extends State<MissionScreen> {
         print("No babies found for user");
         setState(() {
           dropdownItems = [];
+          _selectedBabyAge = null;  // Reset selected age when no babies
           _isLoading = false;
         });
         return;
@@ -121,16 +122,25 @@ class _MissionScreenState extends State<MissionScreen> {
           isCompleted: completedMissions.contains(mission.missionId)
         )
       ).toList();
+ 
 
-      setState(() {
-        _missions = missionsWithStatus;
-      });
-    } catch (e) {
-      print('Error fetching missions: $e');
-    } finally {
-      setState(() => _isLoading = false);
+        setState(() {
+          _missions = missionsWithStatus;
+        });
+      } catch (e) {
+        print('Error fetching missions: $e');
+      } finally {
+        setState(() => _isLoading = false);
+      }
     }
+
+  Future<void> _refreshBabiesList() async {
+    setState(() => _isLoading = true);
+    await _fetchBabiesAndSetupDropdown();
+    await _fetchMissions();
+    setState(() => _isLoading = false);
   }
+  
 
 
   Future<void> _loadMissions() async {
@@ -149,6 +159,9 @@ class _MissionScreenState extends State<MissionScreen> {
       _isLoading = false;
     });
   }
+
+ 
+
 
 
   @override
@@ -179,7 +192,13 @@ class _MissionScreenState extends State<MissionScreen> {
                         labelColor: Colors.white,
                         unselectedLabelColor: Colors.white,
                       ),
+
                       actions: [
+                        IconButton(
+                          icon: const Icon(Icons.refresh, color: Colors.white),
+                          onPressed: _refreshBabiesList,
+                          tooltip: 'Refresh babies list',
+                        ),
 
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),

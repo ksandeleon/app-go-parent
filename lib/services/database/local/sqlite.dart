@@ -156,6 +156,8 @@ class DatabaseService {
       )
     ''');
 
+    
+
 //../commented for now--focus on core functionalities
 //     // logs ../unsure about the schema of this.
 //     await db.execute('''

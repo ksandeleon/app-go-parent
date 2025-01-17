@@ -1,5 +1,4 @@
 // ignore_for_file: unused_import, duplicate_import
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
@@ -24,7 +23,9 @@ import 'screens/mission_page/mission_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+   await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+ );
   if (kIsWeb == false && (defaultTargetPlatform == TargetPlatform.windows || defaultTargetPlatform == TargetPlatform.linux || defaultTargetPlatform == TargetPlatform.macOS)) {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
@@ -65,7 +66,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
 
-      initialRoute: 'welcome_screen',
+      initialRoute: 'welcome_screen', 
       routes: {
         WelcomeScreen.id: (context) => WelcomeScreen(), // welcome_screen
         LoginPage1.id: (context) => LoginPage1(), //id = "login_screen"
