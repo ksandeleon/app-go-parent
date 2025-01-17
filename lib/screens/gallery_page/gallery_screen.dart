@@ -182,12 +182,12 @@ Widget build(BuildContext context) {
                                   if (isSelected) {
                                     selectedPictureIds.remove(picture.pictureId);
                                   } else {
-                                    if (selectedPictureIds.length >= 8) {
+                                    if (selectedPictureIds.length >= 6) {
                                       Alert(
                                         context: context,
                                         type: AlertType.warning,
                                         title: "Selection Limit",
-                                        desc: "You can only select up to 8 pictures for a collage.",
+                                        desc: "You can only select up to 6 pictures for a collage.",
                                         buttons: [
                                           DialogButton(
                                             child: const Text(
@@ -278,7 +278,7 @@ Widget build(BuildContext context) {
                                     .where((picture) => selectedPictureIds.contains(picture.pictureId))
                                     .toList();
 
-                                Navigator.pushReplacement(
+                                Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => CollageCreator(
@@ -292,12 +292,14 @@ Widget build(BuildContext context) {
                                   selectedPictureIds.clear();
                                 });
                               }
+
                             } else {
                               setState(() {
                                 isSelectMode = true;
                               });
                             }
                           },
+
                           child: Icon(
                             isSelectMode ? Icons.check : Icons.add,
                             color: Colors.white,

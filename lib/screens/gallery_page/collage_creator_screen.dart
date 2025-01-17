@@ -49,185 +49,170 @@ class _CollageCreatorState extends State<CollageCreator> {
     }
   }
 
-  List<Widget> _createEvenLayout(List<Widget> images, int count) {
-    List<StaggeredGridTile> tiles = [];
 
-    switch (count) {
-      case 2:
-        // 1x2 grid
-        tiles = [
+
+List<StaggeredGridTile> _createEvenLayout(List<Widget> images, int count) {
+  List<StaggeredGridTile> tiles = [];
+
+  switch (count) {
+    case 2:
+      tiles = [
+        StaggeredGridTile.count(
+          crossAxisCellCount: 2,
+          mainAxisCellCount: 3,
+          child: images[0],
+        ),
+        StaggeredGridTile.count(
+          crossAxisCellCount: 2,
+          mainAxisCellCount: 3,
+          child: images[1],
+        ),
+      ];
+      break;
+
+    case 4:
+      for (int i = 0; i < 4; i++) {
+
+        if (i == 0 || i == 2) {
+          tiles.add(
           StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 2,
-            child: images[0],
+            crossAxisCellCount: 2,
+            mainAxisCellCount: 1.5,
+            child: images[i],
           ),
+        );
+        continue;
+        }
+        tiles.add(
           StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 2,
-            child: images[1],
+            crossAxisCellCount: 2,
+            mainAxisCellCount: 1,
+            child: images[i],
           ),
-        ];
-        break;
+        );
+      }
+      break;
 
-      case 4:
-        // 2x2 grid
-        for (int i = 0; i < 4; i++) {
+    case 6:
+      for (int i = 0; i < 6; i++) {
+
+        if (i == 1 || i == 4) {
           tiles.add(
-            StaggeredGridTile.count(
-              crossAxisCellCount: 1,
-              mainAxisCellCount: 1,
-              child: images[i],
-            ),
-          );
+          StaggeredGridTile.count(
+            crossAxisCellCount: 2,
+            mainAxisCellCount: 1.5,
+            child: images[i],
+          ),
+        );
+        continue;
         }
-        break;
 
-      case 6:
-        // 2x3 grid
-        for (int i = 0; i < 6; i++) {
-          tiles.add(
-            StaggeredGridTile.count(
-              crossAxisCellCount: 1,
-              mainAxisCellCount: 1,
-              child: images[i],
-            ),
-          );
-        }
-        break;
+        tiles.add(
+          StaggeredGridTile.count(
+            crossAxisCellCount: 2,
+            mainAxisCellCount: 1,
+            child: images[i],
+          ),
+        );
+      }
+      break;
 
-      case 8:
-        // 3x3 grid (with center empty)
-        for (int i = 0; i < 8; i++) {
-          if (i == 4) continue; // Skip center tile
-          tiles.add(
-            StaggeredGridTile.count(
-              crossAxisCellCount: 1,
-              mainAxisCellCount: 1,
-              child: images[i],
-            ),
-          );
-        }
-        break;
-    }
-
-    return tiles;
+    default:
+      throw Exception("Unsupported even count: $count");
   }
 
-  List<Widget> _createOddLayout(List<Widget> images, int count) {
-    List<StaggeredGridTile> tiles = [];
+  return tiles;
+}
 
-    switch (count) {
-      case 3:
-        // One large + two small
-        tiles = [
+List<StaggeredGridTile> _createOddLayout(List<Widget> images, int count) {
+  List<StaggeredGridTile> tiles = [];
+
+  switch (count) {
+    case 3:
+      tiles = [
+        StaggeredGridTile.count(
+          crossAxisCellCount: 2,
+          mainAxisCellCount: 1.5,
+          child: images[0],
+        ),
+        StaggeredGridTile.count(
+          crossAxisCellCount: 2,
+          mainAxisCellCount: 1.5,
+          child: images[1],
+        ),
+        StaggeredGridTile.count(
+          crossAxisCellCount: 4,
+          mainAxisCellCount: 2,
+          child: images[2],
+        ),
+      ];
+      break;
+
+    case 5:
+      for (int i = 0; i < 5; i++) {
+
+        if (i == 2) {
+          tiles.add(
+          StaggeredGridTile.count(
+            crossAxisCellCount: 4,
+            mainAxisCellCount: 1.5,
+            child: images[i],
+          ),
+        );
+        continue;
+        }
+
+        tiles.add(
           StaggeredGridTile.count(
             crossAxisCellCount: 2,
-            mainAxisCellCount: 2,
-            child: images[0],
-          ),
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
             mainAxisCellCount: 1,
-            child: images[1],
+            child: images[i],
           ),
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[2],
-          ),
-        ];
-        break;
+        );
+      }
+      break;
 
-      case 5:
-        // One large + four small
-        tiles = [
-          StaggeredGridTile.count(
-            crossAxisCellCount: 2,
-            mainAxisCellCount: 2,
-            child: images[0],
-          ),
-          ...List.generate(4, (index) =>
-            StaggeredGridTile.count(
-              crossAxisCellCount: 1,
-              mainAxisCellCount: 1,
-              child: images[index + 1],
-            ),
-          ),
-        ];
-        break;
-
-      case 7:
-        // One large center + six around
-        tiles = [
-          // Center large image
-          StaggeredGridTile.count(
-            crossAxisCellCount: 2,
-            mainAxisCellCount: 2,
-            child: images[0],
-          ),
-          // Top row
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[1],
-          ),
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[2],
-          ),
-          // Middle row (sides)
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[3],
-          ),
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[4],
-          ),
-          // Bottom row
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[5],
-          ),
-          StaggeredGridTile.count(
-            crossAxisCellCount: 1,
-            mainAxisCellCount: 1,
-            child: images[6],
-          ),
-        ];
-        break;
-    }
-
-    return tiles;
+    default:
+      throw Exception("Unsupported odd count: $count");
   }
+
+  return tiles;
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.green,
       appBar: AppBar(
-        title: const Text('Create Collage'),
+        title: const Text('Create Collage', style: TextStyle(color: Colors.white),),
         backgroundColor: Colors.teal,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: () {
-              // TODO: Implement save collage functionality
-              // This is where you'll save the collage and add it to your database
-            },
+          Tooltip(
+            message: "Finish Creation",
+            child: IconButton(
+              icon: const Icon(Icons.check, color: Colors.white,),
+              onPressed: () {
+                // TODO: Implement save collage functionality
+                // This is where you'll save the collage and add it to your database
+              },
+            ),
           ),
         ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: StaggeredGrid.count(
-          crossAxisCount: 2,
-          mainAxisSpacing: 8,
-          crossAxisSpacing: 8,
-          children: collageLayout,
+        child: Center(
+          child: SizedBox(
+            height: 900,
+            width: 900,
+            child: StaggeredGrid.count(
+              crossAxisCount: 4,
+              mainAxisSpacing: 8,
+              crossAxisSpacing: 8,
+              children: collageLayout,
+            ), 
+          ),
         ),
       ),
     );
