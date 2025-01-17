@@ -20,6 +20,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class CollageScreen extends StatefulWidget {
   const CollageScreen({super.key});
+  static String id = "collage_screen";
 
   @override
   State<CollageScreen> createState() => _CollageScreenState();

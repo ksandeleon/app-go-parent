@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_parent/screens/gallery_page/collage_creator_screen.dart';
 import 'package:go_parent/screens/gallery_page/collage_screen.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
@@ -228,7 +229,9 @@ Widget build(BuildContext context) {
                                         ),
                                       ),
                                     ),
+
                                     // ... rest of your image details ...
+
                                   ],
                                 ),
                                 if (isSelectMode)
@@ -269,10 +272,25 @@ Widget build(BuildContext context) {
                           backgroundColor: Colors.teal,
                           onPressed: () {
                             if (isSelectMode) {
-                              // Handle creating collage with selected pictures
                               if (selectedPictureIds.isNotEmpty) {
-                                // Add your collage creation logic here
-                                print('Creating collage with ${selectedPictureIds.length} pictures');
+
+                                List<PictureModel> selectedPictures = pictures
+                                    .where((picture) => selectedPictureIds.contains(picture.pictureId))
+                                    .toList();
+
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CollageCreator(
+                                      selectedPictures: selectedPictures,
+                                    ),
+                                  ),
+                                );
+
+                                setState(() {
+                                  isSelectMode = false;
+                                  selectedPictureIds.clear();
+                                });
                               }
                             } else {
                               setState(() {
