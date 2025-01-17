@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:go_parent/screens/gallery_page/collage_screen.dart';
 import 'package:go_parent/screens/gallery_page/gallery_brain.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
@@ -35,9 +36,32 @@ class _CollageCreatorState extends State<CollageCreator> {
   late List<bool> flipHorizontal;
   late List<bool> flipVertical;
   late final GalleryBrain _galleryBrain;
+  Color selectedBackgroundColor = Colors.teal[200]!;
   int? selectedImageIndex;
 
   final GlobalKey _collageKey = GlobalKey();
+
+final List<Color> backgroundColors = [
+  Colors.teal[200]!,
+  Colors.white,
+  Colors.black,
+  Colors.grey[300]!,
+  Colors.pink[100]!,
+  Colors.blue[100]!,
+  Colors.green[100]!,
+  Colors.orange[100]!,
+  Colors.purple[100]!,
+  Colors.yellow[100]!,
+  Color(0xffc6dbef),
+  Color(0xffa2b5a5),
+  Color(0xffffc700),
+  Color(0xfffce4e1),
+  Color(0xff87ceeb),
+  Color(0xfff0f0e6),
+  Color(0xffccccb3),
+  Color(0xff800020),
+  Color(0xff40e0d0),
+];
 
   @override
   void initState() {
@@ -48,8 +72,6 @@ class _CollageCreatorState extends State<CollageCreator> {
     imageScales = List.generate(pictures.length, (index) => 1.0);
     flipHorizontal = List.generate(pictures.length, (index) => false);
     flipVertical = List.generate(pictures.length, (index) => false);
-
-
   }
 
 
@@ -77,39 +99,31 @@ class _CollageCreatorState extends State<CollageCreator> {
     ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
     Uint8List pngBytes = byteData!.buffer.asUint8List();
 
-    // Save to a file
     final directory = await getApplicationDocumentsDirectory();
     String filePath = '${directory.path}/collage_${DateTime.now().millisecondsSinceEpoch}.png';
     File imgFile = File(filePath);
     await imgFile.writeAsBytes(pngBytes);
 
-    // Save the file path to the database
+    //implement a pop up where the user is prompted for a collage title and use it to insertcollage
+
     CollageModel collage = CollageModel(
       userId: UserSession().userId!,
-      title: 'My Collage',
+      title: 'My Collage', //replace this
       collageData: filePath,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
-
 
     int result = await _galleryBrain.collageHelper.insertCollage(collage);
 
     if (result > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Collage saved successfully at $filePath')),
-
-      //   List<Map<CollagePictur>> collagePictures = pictures.map((picture) {
-      //   return {
-      //     'collageId': collageId,
-      //     'pictureId': picture.pictureId,
-      //   };
-      // }).toList();
-
-      // await _galleryBrain.collagePicturesHelper
-      //     .insertCollagePictures(collagePictures);
-
       );
+
+      Navigator.pop(context);
+
+
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to save collage.')),
@@ -122,10 +136,6 @@ class _CollageCreatorState extends State<CollageCreator> {
     );
   }
 }
-
-
-
-
 
 
 Widget _buildImageTile(int index, int crossAxisCount, double mainAxisCount) {
@@ -154,31 +164,13 @@ Widget _buildImageTile(int index, int crossAxisCount, double mainAxisCount) {
                 ),
               ),
             ),
-            Positioned(
-              top: 8,
-              right: 8,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  '${index + 1}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
     );
   }
 
-   Widget _buildTransformControls(int index, StateSetter setModalState) {
+  Widget _buildTransformControls(int index, StateSetter setModalState) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -268,7 +260,7 @@ Widget _buildImageTile(int index, int crossAxisCount, double mainAxisCount) {
     );
   }
 
- Widget _buildFlipButton({
+  Widget _buildFlipButton({
     required IconData icon,
     required String label,
     required bool isActive,
@@ -408,75 +400,75 @@ void _showImageAdjustment(int index) {
     );
   }
 
-void _showOptions(int index) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: const EdgeInsets.all(16),
+  void _showOptions(int index) {
+      showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return Container(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Image ${index + 1} Options',
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildOptionButton(
+                      icon: Icons.swap_horiz,
+                      label: 'Swap',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showSwapOptions(index);
+                      },
+                    ),
+                    _buildOptionButton(
+                      icon: Icons.crop,
+                      label: 'Adjust',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _showImageAdjustment(index);
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+  Widget _buildOptionButton({
+      required IconData icon,
+      required String label,
+      required VoidCallback onTap,
+    }) {
+      return InkWell(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.teal.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Image ${index + 1} Options',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _buildOptionButton(
-                    icon: Icons.swap_horiz,
-                    label: 'Swap',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showSwapOptions(index);
-                    },
-                  ),
-                  _buildOptionButton(
-                    icon: Icons.crop,
-                    label: 'Adjust',
-                    onTap: () {
-                      Navigator.pop(context);
-                      _showImageAdjustment(index);
-                    },
-                  ),
-                ],
-              ),
+              Icon(icon, color: Colors.teal),
+              const SizedBox(height: 4),
+              Text(label),
             ],
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildOptionButton({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.teal.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Colors.teal),
-            const SizedBox(height: 4),
-            Text(label),
-          ],
-        ),
-      ),
-    );
-  }
+      );
+    }
 
 
 
@@ -654,41 +646,109 @@ void _showOptions(int index) {
     return tiles;
   }
 
-@override
-Widget build(BuildContext context) {
-  return Scaffold(
-    backgroundColor: Colors.green,
-    appBar: AppBar(
-      title: const Text('Create Collage', style: TextStyle(color: Colors.white)),
-      backgroundColor: Colors.teal,
-      actions: [
-        Tooltip(
-          message: "Finish Creation",
-          child: IconButton(
-            icon: const Icon(Icons.check, color: Colors.white),
-            onPressed: () => saveCollageAsImage(context),
+Widget _buildColorPicker() {
+    return Container(
+      margin: const EdgeInsets.only(right: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
-        ),
-      ],
-    ),
-    body: Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Center(
-        child: RepaintBoundary(
-          key: _collageKey,
-          child: SizedBox(
-            height: 900,
-            width: 900,
-            child: StaggeredGrid.count(
-              crossAxisCount: 4,
-              mainAxisSpacing: 8,
-              crossAxisSpacing: 8,
-              children: _createCollageLayout(),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(8.0),
+            child: Text(
+              'Background',
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
           ),
-        ),
+          ...backgroundColors.map((color) => GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedBackgroundColor = color;
+              });
+            },
+            child: Container(
+              width: 30,
+              height: 30,
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selectedBackgroundColor == color
+                      ? Colors.teal
+                      : Colors.grey[300]!,
+                  width: selectedBackgroundColor == color ? 2 : 1,
+                ),
+              ),
+            ),
+          )).toList(),
+        ],
       ),
-    ),
-  );
-}
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.green,
+      appBar: AppBar(
+        title: const Text('Create Collage', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.teal,
+        actions: [
+          Tooltip(
+            message: "Finish Creation",
+            child: IconButton(
+              icon: const Icon(Icons.check, color: Colors.white),
+              onPressed: () => saveCollageAsImage(context),
+            ),
+          ),
+        ],
+      ),
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Center(
+              child: RepaintBoundary(
+                key: _collageKey,
+                child: Container(
+                  color: selectedBackgroundColor,
+                  child: SizedBox(
+                    width: 900,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: StaggeredGrid.count(
+                        crossAxisCount: 4,
+                        mainAxisSpacing: 8,
+                        crossAxisSpacing: 8,
+                        children: _createCollageLayout(),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 0,
+            top: MediaQuery.of(context).size.height * 0.2,
+            child: _buildColorPicker(),
+          ),
+        ],
+      ),
+    );
+  }
 }
