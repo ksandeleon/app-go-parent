@@ -158,28 +158,84 @@ class _CollageScreenState extends State<CollageScreen> {
 
 
 
-                // Positioned(
-                //     right: 32,
-                //     bottom: 32,
-                //     child: Tooltip(
-                //       message: "Create a new collage",
-                //       child: FloatingActionButton(
-                //         backgroundColor: Colors.teal,
-                //         onPressed: () {
-                //           if (isSelectMode) {
-                //             if (selectedPictureIds.isNotEmpty) {
-                //               _createCollage();
-                //             }
-                //           } else {
-                //             setState(() {
-                //               isSelectMode = true;
-                //             });
-                //           }
-                //         },
-                //         child: const Icon(
-                //           Icons.add,
-                //           color: Colors.white,
-                //         ),
-                //       ),
-                //     ),
-                //   ),
+
+
+
+  // Future<void> _createCollage() async {
+  //   if (selectedPictureIds.isEmpty) return;
+
+  //   final titleController = TextEditingController();
+  //   final result = await showDialog<bool>(
+  //     context: context,
+  //     builder: (context) => AlertDialog(
+  //       title: const Text('Create Collage'),
+  //       content: TextField(
+  //         controller: titleController,
+  //         decoration: const InputDecoration(
+  //           labelText: 'Collage Title',
+  //           hintText: 'Enter a title for your collage',
+  //         ),
+  //       ),
+  //       actions: [
+  //         TextButton(
+  //           onPressed: () => Navigator.pop(context, false),
+  //           child: const Text('Cancel'),
+  //         ),
+  //         ElevatedButton(
+  //           onPressed: () => Navigator.pop(context, true),
+  //           child: const Text('Create'),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+
+
+  // if (result == true && titleController.text.isNotEmpty) {
+  //   try {
+  //     // Create collage data
+  //     final collageData = {
+  //       'layout': 'grid', // You can make this configurable
+  //       'selectedPictures': selectedPictureIds.toList(),
+  //     };
+
+  //   final collageId = await galleryBrain.collageHelper.insertCollage(
+  //       CollageModel(
+  //         userId: userId!,
+  //         title: titleController.text,
+  //         collageData: jsonEncode(collageData),
+  //         createdAt: DateTime.now(),
+  //         updatedAt: DateTime.now()
+  //       ),
+  //     );
+
+    // Insert collage pictures using CollagePicturesHelper
+  //   final collagePictures = selectedPictureIds.map((pictureId) => {
+  //     'collageId': collageId,
+  //     'pictureId': pictureId,
+  //   }).toList();
+
+  //   await galleryBrain.collagePicturesHelper.insertCollagePictures(collagePictures);
+
+
+  //     // Exit select mode and clear selections
+  //     setState(() {
+  //       isSelectMode = false;
+  //       selectedPictureIds.clear();
+  //     });
+
+  //     // Exit select mode and clear selections
+  //     setState(() {
+  //       isSelectMode = false;
+  //       selectedPictureIds.clear();
+  //     });
+
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         const SnackBar(content: Text('Collage created successfully!')),
+  //       );
+  //     } catch (e) {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('Error creating collage: $e')),
+  //       );
+  //     }
+  //   }
+  // }

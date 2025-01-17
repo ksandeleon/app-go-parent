@@ -14,6 +14,7 @@ import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class GalleryScreen extends StatefulWidget {
@@ -88,109 +89,42 @@ class _GalleryScreenState extends State<GalleryScreen> {
     return DateFormat('MMM d, y').format(date);
   }
 
-
-  Future<void> _createCollage() async {
-    if (selectedPictureIds.isEmpty) return;
-
-    final titleController = TextEditingController();
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Create Collage'),
-        content: TextField(
-          controller: titleController,
-          decoration: const InputDecoration(
-            labelText: 'Collage Title',
-            hintText: 'Enter a title for your collage',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Create'),
-          ),
-        ],
-      ),
-    );
-
-
-  if (result == true && titleController.text.isNotEmpty) {
-    try {
-      // Create collage data
-      final collageData = {
-        'layout': 'grid', // You can make this configurable
-        'selectedPictures': selectedPictureIds.toList(),
-      };
-
-    final collageId = await galleryBrain.collageHelper.insertCollage(
-        CollageModel(
-          userId: userId!,
-          title: titleController.text,
-          collageData: jsonEncode(collageData),
-          createdAt: DateTime.now(),
-          updatedAt: DateTime.now()
-        ),
-      );
-
-    // Insert collage pictures using CollagePicturesHelper
-    final collagePictures = selectedPictureIds.map((pictureId) => {
-      'collageId': collageId,
-      'pictureId': pictureId,
-    }).toList();
-
-    await galleryBrain.collagePicturesHelper.insertCollagePictures(collagePictures);
-
-
-      // Exit select mode and clear selections
-      setState(() {
-        isSelectMode = false;
-        selectedPictureIds.clear();
-      });
-
-      // Exit select mode and clear selections
-      setState(() {
-        isSelectMode = false;
-        selectedPictureIds.clear();
-      });
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Collage created successfully!')),
-        );
-      } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error creating collage: $e')),
-        );
-      }
-    }
+@override
+Widget build(BuildContext context) {
+  if (isLoading) {
+    return const Center(child: CircularProgressIndicator());
   }
 
+  if (pictures.isEmpty) {
+    return const Center(child: Text('No pictures found'));
+  }
 
-
-
-  @override
-  Widget build(BuildContext context) {
-    if (isLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (pictures.isEmpty) {
-      return const Center(child: Text('No pictures found'));
-    }
-
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 8,
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.teal,
-        title: const Text(
-          'Go Gallery',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-        actions: [
+  return Scaffold(
+    appBar: AppBar(
+      elevation: 8,
+      automaticallyImplyLeading: false,
+      backgroundColor: Colors.teal,
+      title: isSelectMode
+        ? Text(
+            '${selectedPictureIds.length} Selected',
+            style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          )
+        : const Text(
+            'Go Gallery',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+      actions: [
+        if (isSelectMode)
+          IconButton(
+            icon: const Icon(Icons.close, color: Colors.white),
+            onPressed: () {
+              setState(() {
+                isSelectMode = false;
+                selectedPictureIds.clear();
+              });
+            },
+          )
+        else
           Tooltip(
             message: 'Refresh gallery',
             child: IconButton(
@@ -198,119 +132,173 @@ class _GalleryScreenState extends State<GalleryScreen> {
               onPressed: _loadPictures,
             ),
           ),
-        ],
-      ),
-      body: DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: AppBar(
-            backgroundColor: Colors.white38,
-            elevation: 0,
-            bottom: const TabBar(
-              indicatorColor: Colors.black,
-              labelColor: Colors.black,
-              unselectedLabelColor: Colors.black54,
-              tabs: [
-                Tab(text: 'Joyful Pictures', icon: Icon(Icons.image)),
-                Tab(text: 'Memory Collage', icon: Icon(Icons.grid_on)),
-              ],
+      ],
+    ),
+    body: DefaultTabController(
+      length: 2,
+      child: Stack(
+        children: [
+          Scaffold(
+            backgroundColor: Colors.white,
+            appBar: AppBar(
+              backgroundColor: Colors.white38,
+              elevation: 0,
+              bottom: const TabBar(
+                indicatorColor: Colors.black,
+                labelColor: Colors.black,
+                unselectedLabelColor: Colors.black54,
+                tabs: [
+                  Tab(text: 'Joyful Pictures', icon: Icon(Icons.image)),
+                  Tab(text: 'Memory Collage', icon: Icon(Icons.grid_on)),
+                ],
+              ),
             ),
-          ),
-          body: TabBarView(
-            children: [
-              GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
-                childAspectRatio: 0.8,
-                ),
-                itemCount: pictures.length,
-                itemBuilder: (context, index) {
-                  final picture = pictures[index];
-                  final heroTag = 'picture_${picture.pictureId}';
+            body: TabBarView(
+              children: [
+                Stack(
+                  children: [
+                    GridView.builder(
+                      padding: const EdgeInsets.all(8),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 4,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                        childAspectRatio: 0.8,
+                      ),
+                      itemCount: pictures.length,
+                      itemBuilder: (context, index) {
+                        final picture = pictures[index];
+                        final heroTag = 'picture_${picture.pictureId}';
+                        final isSelected = selectedPictureIds.contains(picture.pictureId);
 
-                  return Card(
-                    clipBehavior: Clip.antiAlias,
-                    elevation: 2,
-                    child: InkWell(
-                      onTap: () => _showFullScreenImage(context, picture, heroTag),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          Expanded(
-                            child: Hero(
-                              tag: heroTag,
-                              child: Image.file(
-                                File(picture.photoPath),
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: Colors.grey[300],
-                                    child: const Icon(Icons.error),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                        return Card(
+                          clipBehavior: Clip.antiAlias,
+                          elevation: 2,
+                          child: InkWell(
+                            onTap: () {
+                              if (isSelectMode) {
+                                setState(() {
+                                  if (isSelected) {
+                                    selectedPictureIds.remove(picture.pictureId);
+                                  } else {
+                                    if (selectedPictureIds.length >= 8) {
+                                      Alert(
+                                        context: context,
+                                        type: AlertType.warning,
+                                        title: "Selection Limit",
+                                        desc: "You can only select up to 8 pictures for a collage.",
+                                        buttons: [
+                                          DialogButton(
+                                            child: const Text(
+                                              "OK",
+                                              style: TextStyle(color: Colors.white, fontSize: 20),
+                                            ),
+                                            onPressed: () => Navigator.pop(context),
+                                            color: Colors.teal,
+                                          )
+                                        ],
+                                      ).show();
+                                      return;
+                                    }
+                                    selectedPictureIds.add(picture.pictureId!);
+                                  }
+                                });
+                              } else {
+                                _showFullScreenImage(context, picture, heroTag);
+                              }
+                            },
+                            child: Stack(
+                              fit: StackFit.expand,
                               children: [
-                                Row(
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
-                                    Icon(
-                                      picture.isCollage ? Icons.grid_on : Icons.image,
-                                      size: 16,
-                                      color: Colors.grey[600],
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      picture.isCollage ? 'Collage' : 'Single Image',
-                                      style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontSize: 12,
+                                    Expanded(
+                                      child: Hero(
+                                        tag: heroTag,
+                                        child: Image.file(
+                                          File(picture.photoPath),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.error),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ),
+                                    // ... rest of your image details ...
                                   ],
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _formatDate(picture.createdAt),
-                                  style: TextStyle(
-                                    color: Colors.grey[800],
-                                    fontSize: 12,
+                                if (isSelectMode)
+                                  Positioned(
+                                    top: 8,
+                                    right: 8,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: isSelected ? Colors.teal : Colors.white,
+                                        border: Border.all(
+                                          color: Colors.teal,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(2.0),
+                                        child: Icon(
+                                          Icons.check,
+                                          size: 16,
+                                          color: isSelected ? Colors.white : Colors.transparent,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  'Mission ID: ${picture.userMissionId}',
-                                  style: TextStyle(
-                                    color: Colors.grey[600],
-                                    fontSize: 11,
-                                  ),
-                                ),
                               ],
                             ),
                           ),
-                        ],
+                        );
+                      },
+                    ),
+                    Positioned(
+                      right: 32,
+                      bottom: 32,
+                      child: Tooltip(
+                        message: isSelectMode ? "Create collage" : "Select pictures",
+                        child: FloatingActionButton(
+                          backgroundColor: Colors.teal,
+                          onPressed: () {
+                            if (isSelectMode) {
+                              // Handle creating collage with selected pictures
+                              if (selectedPictureIds.isNotEmpty) {
+                                // Add your collage creation logic here
+                                print('Creating collage with ${selectedPictureIds.length} pictures');
+                              }
+                            } else {
+                              setState(() {
+                                isSelectMode = true;
+                              });
+                            }
+                          },
+                          child: Icon(
+                            isSelectMode ? Icons.check : Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                  );
-                },
-              ),
-
-              //secondpage here <= place to operate collages
-              CollageScreen()
-
-            ],
+                  ],
+                ),
+                CollageScreen(),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _showFullScreenImage(BuildContext context, PictureModel picture, String heroTag) {
     showDialog(
