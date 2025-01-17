@@ -20,13 +20,19 @@ class CollageHelper {
     }
   }
 
-    Future<List<CollageModel>> getAllCollages() async {
+    /// Retrieve all collages by userId
+  Future<List<CollageModel>> getAllCollagesByUserId(int userId) async {
     try {
-      final List<Map<String, dynamic>> result = await db.query('collagedb');
+      final List<Map<String, dynamic>> result = await db.query(
+        'collagedb',
+        where: 'userId = ?',
+        whereArgs: [userId],
+      );
+
       return result.map((map) => CollageModel.fromMap(map)).toList();
-    } catch (error) {
-      print('Error retrieving collages: $error');
-      return []; // Handle errors gracefully, e.g., return empty list
+    } catch (e) {
+      print("Error retrieving collages by userId: $e");
+      return []; // Return an empty list in case of an error
     }
   }
 
@@ -49,16 +55,6 @@ class CollageHelper {
     }
   }
 
-  // /// Retrieve all collages
-  // Future<List<CollageModel>> getAllCollages() async {
-  //   try {
-  //     final List<Map<String, dynamic>> result = await db.query('collagedb');
-  //     return result.map((map) => CollageModel.fromMap(map)).toList();
-  //   } catch (e) {
-  //     print("Error retrieving all collages: $e");
-  //     return [];
-  //   }
-  // }
 
   /// Retrieve all collages by title (if needed)
   Future<List<CollageModel>> getCollagesByTitle(String title) async {
@@ -116,17 +112,4 @@ class CollageHelper {
     }
   }
 
-  /// Retrieve collages with a specific picture ID (if needed)
-  Future<List<CollageModel>> getCollagesByPictureId(int pictureId) async {
-    // If pictureId exists in schema, uncomment and adjust
-    // final List<Map<String, dynamic>> result = await db.query(
-    //   'collagedb',
-    //   where: 'pictureId = ?',
-    //   whereArgs: [pictureId],
-    // );
-
-    // If you don’t have a pictureId in the schema yet, you should either remove this method
-    // or modify your database schema to include it.
-    return [];
-  }
 }

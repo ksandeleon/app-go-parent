@@ -45,13 +45,6 @@ final List<Color> backgroundColors = [
   Colors.teal[200]!,
   Colors.white,
   Colors.black,
-  Colors.grey[300]!,
-  Colors.pink[100]!,
-  Colors.blue[100]!,
-  Colors.green[100]!,
-  Colors.orange[100]!,
-  Colors.purple[100]!,
-  Colors.yellow[100]!,
   Color(0xffc6dbef),
   Color(0xffa2b5a5),
   Color(0xffffc700),
@@ -84,15 +77,13 @@ final List<Color> backgroundColors = [
     final collageHelper = CollageHelper(db);
     final collagePicturesHelper = CollagePicturesHelper(db);
     _galleryBrain = GalleryBrain(pictureHelper, collageHelper, collagePicturesHelper);
-
   }
 
 
-
-  Future<void> saveCollageAsImage(BuildContext context) async {
+Future<void> saveCollageAsImage(BuildContext context) async {
   try {
     RenderRepaintBoundary boundary =
-      _collageKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
+    _collageKey.currentContext!.findRenderObject() as RenderRepaintBoundary;
 
     // Capture the image as bytes
     ui.Image image = await boundary.toImage();
@@ -100,15 +91,52 @@ final List<Color> backgroundColors = [
     Uint8List pngBytes = byteData!.buffer.asUint8List();
 
     final directory = await getApplicationDocumentsDirectory();
-    String filePath = '${directory.path}/collage_${DateTime.now().millisecondsSinceEpoch}.png';
+    final targetPath = Directory('${directory.path}/GoParentCollages');
+
+    if (!await targetPath.exists()) {
+      await targetPath.create();
+    }
+
+    String filePath =
+        '${targetPath.path}/collage_${DateTime.now().millisecondsSinceEpoch}.png';
+
     File imgFile = File(filePath);
     await imgFile.writeAsBytes(pngBytes);
 
-    //implement a pop up where the user is prompted for a collage title and use it to insertcollage
+    TextEditingController titleController = TextEditingController();
+    String? title = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Enter A Title'),
+          content: TextField(
+            controller: titleController,
+            decoration: InputDecoration(hintText: 'Enter Collage Title'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(null);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(titleController.text);
+              },
+              child: Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // If the user cancels, exit early
+    if (title == null || title.isEmpty) return;
 
     CollageModel collage = CollageModel(
       userId: UserSession().userId!,
-      title: 'My Collage', //replace this
+      title: title, // Use the entered title
       collageData: filePath,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
@@ -122,21 +150,17 @@ final List<Color> backgroundColors = [
       );
 
       Navigator.pop(context);
-
-
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save collage.')),
+        SnackBar(content: Text('Failed to save collage. Please try again.')),
       );
     }
   } catch (e) {
-    print("Error saving collage: $e");
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error saving collage.')),
+      SnackBar(content: Text('Error: ${e.toString()}')),
     );
   }
 }
-
 
 Widget _buildImageTile(int index, int crossAxisCount, double mainAxisCount) {
     return StaggeredGridTile.count(
@@ -703,8 +727,14 @@ Widget _buildColorPicker() {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.white,
       appBar: AppBar(
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+          tooltip: 'Cancel',
+          onPressed: () => Navigator.pop(context),
+        ),
         title: const Text('Create Collage', style: TextStyle(color: Colors.white)),
         backgroundColor: Colors.teal,
         actions: [
@@ -744,7 +774,7 @@ Widget _buildColorPicker() {
           ),
           Positioned(
             right: 0,
-            top: MediaQuery.of(context).size.height * 0.2,
+            top: (MediaQuery.of(context).size.height * 0.2) ,
             child: _buildColorPicker(),
           ),
         ],
