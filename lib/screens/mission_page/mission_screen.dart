@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_parent/Screen/prototypeMissionGraph.dart';
-import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/missions_helper.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
@@ -9,6 +7,7 @@ import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:go_parent/screens/mission_page/mission_brain.dart';
 
@@ -36,6 +35,7 @@ class _MissionScreenState extends State<MissionScreen> {
   int totalPoints = 0;
 
   int? _selectedBabyAge;
+  String? _selectedBabyName;
   String? photoPath;
 
   List<DropdownMenuEntry<int>> dropdownItems = [];
@@ -90,10 +90,14 @@ class _MissionScreenState extends State<MissionScreen> {
             .toList();
         // Set initial selected age
         _selectedBabyAge = babies.first.babyAge;
+        _selectedBabyName = babies.first.babyName;
       });
 
       // Fetch initial missions
       await _fetchMissions();
+
+
+
     } catch (e) {
       print('Error setting up dropdown: $e');
     } finally {
@@ -198,8 +202,35 @@ class _MissionScreenState extends State<MissionScreen> {
                                       ))
                                   .toList(),
                               onChanged: (int? age) async {
-                                setState(() => _selectedBabyAge = age);
+                                setState(() {
+                                  _selectedBabyAge = age;
+
+                                  // Update the selected baby name
+                                  _selectedBabyName = dropdownItems
+                                      .firstWhere((item) => item.value == age)
+                                      .label;
+                                });
                                 await _fetchMissions();
+
+                                // Show RFlutter Alert
+                                final firstBabyName = _selectedBabyName;
+                                Alert(
+                                  context: context,
+                                  type: AlertType.success,
+                                  title: "Missions Loaded",
+                                  desc: "Loaded missions curated for baby $firstBabyName.",
+                                  buttons: [
+                                    DialogButton(
+                                      child: Text(
+                                        "OK",
+                                        style: TextStyle(color: Colors.white, fontSize: 18),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                      width: 120,
+                                    )
+                                  ],
+                                ).show();
+
                               },
                               style: const TextStyle(color: Colors.white),
                               iconEnabledColor: Colors.white,

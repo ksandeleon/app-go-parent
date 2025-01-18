@@ -20,7 +20,7 @@ class DatabaseService {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'goparent_v5.db');
+    String path = join(await getDatabasesPath(), 'goparent_v6.db');
     return await openDatabase(
       path,
       version: 1,
@@ -110,85 +110,6 @@ class DatabaseService {
       )
     ''');
 
-    // collage_pictures
-    await db.execute('''
-      CREATE TABLE collage_pictures (
-        collageId INTEGER NOT NULL,
-        pictureId INTEGER NOT NULL,
-        FOREIGN KEY (collageId) REFERENCES collagesdb(collageId),
-        FOREIGN KEY (pictureId) REFERENCES picturesdb(pictureId),
-        PRIMARY KEY (collageId, pictureId)
-      )
-    ''');
-
-    // rewards
-    await db.execute('''
-      CREATE TABLE rewardsdb (
-        rewardId INTEGER PRIMARY KEY AUTOINCREMENT,
-        pointsRequired INTEGER NOT NULL,
-        rewardType TEXT NOT NULL,
-        rewardData TEXT NOT NULL
-      )
-    ''');
-
-     // user rewards tracker
-    await db.execute('''
-      CREATE TABLE user_rewards (
-        userRewardId INTEGER PRIMARY KEY AUTOINCREMENT,
-        userId INTEGER NOT NULL,
-        rewardId INTEGER NOT NULL,
-        isUnlocked BOOLEAN DEFAULT 0,
-        FOREIGN KEY (userId) REFERENCES userdb(userId),
-        FOREIGN KEY (rewardId) REFERENCES rewardsdb(rewardId)
-      )
-    ''');
-
-    // notes with full-text search capability
-    await db.execute('''
-      CREATE TABLE notesdb (
-        noteId INTEGER PRIMARY KEY AUTOINCREMENT,
-        userId INTEGER NOT NULL,
-        title TEXT NOT NULL,
-        content TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (userId) REFERENCES userdb(userId) ON DELETE CASCADE
-      )
-    ''');
-
-//../commented for now--focus on core functionalities
-//     // logs ../unsure about the schema of this.
-//     await db.execute('''
-//       CREATE TABLE logsdb (
-//         logId INTEGER PRIMARY KEY AUTOINCREMENT,
-//         userId INTEGER NOT NULL,
-//         action TEXT NOT NULL,
-//         targetId INTEGER,
-//         timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-//         FOREIGN KEY (userId) REFERENCES userdb(userId)
-//       )
-
-//       CREATE TABLE logsdb (
-//   logId INTEGER PRIMARY KEY AUTOINCREMENT,
-//   userId INTEGER NOT NULL, -- References the user performing the action
-//   actionType TEXT NOT NULL, -- Standardized action type (e.g., "create", "delete")
-//   targetType TEXT, -- Type of entity affected (e.g., "mission", "picture", "collage")
-//   targetId INTEGER, -- ID of the affected entity
-//   metadata TEXT, -- Optional JSON data for additional details
-//   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Time of the action
-//   FOREIGN KEY (userId) REFERENCES userdb(userId)
-// );
-//     ''');
-
-    // // emergency_supportdb (Low Priority)
-    // await db.execute('''
-    //   CREATE TABLE emergency_supportdb (
-    //     supportId INTEGER PRIMARY KEY AUTOINCREMENT,
-    //     contactName TEXT NOT NULL,
-    //     phoneNumber TEXT NOT NULL,
-    //     category TEXT NOT NULL
-    //   )
-    // ''');
   }
 
 Future<void> listTables() async {

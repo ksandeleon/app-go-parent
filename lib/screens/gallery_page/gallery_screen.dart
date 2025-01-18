@@ -82,9 +82,6 @@ Widget build(BuildContext context) {
     return const Center(child: CircularProgressIndicator());
   }
 
-  if (pictures.isEmpty) {
-    return const Center(child: Text('No pictures found'));
-  }
 
   return Scaffold(
     appBar: AppBar(
@@ -129,10 +126,11 @@ Widget build(BuildContext context) {
             backgroundColor: Colors.white,
             appBar: AppBar(
               backgroundColor: Colors.white38,
+              automaticallyImplyLeading: false,
               elevation: 0,
               bottom: const TabBar(
-                indicatorColor: Colors.black,
-                labelColor: Colors.black,
+                indicatorColor: Colors.teal,
+                labelColor: Colors.teal,
                 unselectedLabelColor: Colors.black54,
                 tabs: [
                   Tab(text: 'Joyful Pictures', icon: Icon(Icons.image)),
@@ -142,7 +140,9 @@ Widget build(BuildContext context) {
             ),
             body: TabBarView(
               children: [
-                Stack(
+                pictures.isEmpty
+                ? const Center(child: Text('No pictures found' ,style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)) // Show message when no pictures
+                : Stack(
                   children: [
                     GridView.builder(
                       padding: const EdgeInsets.all(8),
@@ -160,7 +160,14 @@ Widget build(BuildContext context) {
 
                         return Card(
                           clipBehavior: Clip.antiAlias,
-                          elevation: 2,
+                          elevation: 8,
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              color: Colors.teal, // Teal border
+                              width: isSelected ? 6.0 : 3.0, // Thicker border if selected
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
                           child: InkWell(
                             onTap: () {
                               if (isSelectMode) {
@@ -245,7 +252,7 @@ Widget build(BuildContext context) {
                                   ),
                               ],
                             ),
-                          ),
+                        ),
                         );
                       },
                     ),
@@ -253,13 +260,46 @@ Widget build(BuildContext context) {
                       right: 32,
                       bottom: 32,
                       child: Tooltip(
-                        message: isSelectMode ? "Create collage" : "Select pictures",
+                        message: isSelectMode ? "Continue" : "Create Collage",
                         child: FloatingActionButton(
                           backgroundColor: Colors.teal,
                           onPressed: () {
                             if (isSelectMode) {
-                              if (selectedPictureIds.isNotEmpty) {
-
+                              if (selectedPictureIds.isEmpty) {
+                                Alert(
+                                  context: context,
+                                  type: AlertType.warning,
+                                  title: "No Pictures Selected",
+                                  desc: "Please select at least two pictures to create a collage.",
+                                  buttons: [
+                                    DialogButton(
+                                      child: const Text(
+                                        "OK",
+                                        style: TextStyle(color: Colors.white, fontSize: 20),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                      color: Colors.teal,
+                                    ),
+                                  ],
+                                ).show();
+                              } else if (selectedPictureIds.length < 2) {
+                                Alert(
+                                  context: context,
+                                  type: AlertType.warning,
+                                  title: "Not Enough Pictures",
+                                  desc: "You need at least two pictures to create a collage.",
+                                  buttons: [
+                                    DialogButton(
+                                      child: const Text(
+                                        "OK",
+                                        style: TextStyle(color: Colors.white, fontSize: 20),
+                                      ),
+                                      onPressed: () => Navigator.pop(context),
+                                      color: Colors.teal,
+                                    ),
+                                  ],
+                                ).show();
+                              } else {
                                 List<PictureModel> selectedPictures = pictures
                                     .where((picture) => selectedPictureIds.contains(picture.pictureId))
                                     .toList();
@@ -278,7 +318,6 @@ Widget build(BuildContext context) {
                                   selectedPictureIds.clear();
                                 });
                               }
-
                             } else {
                               setState(() {
                                 isSelectMode = true;
