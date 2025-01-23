@@ -1,14 +1,10 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_parent/Beta%20Testing%20Folder/note_screen.dart';
-import 'package:go_parent/Screen/dashboard.dart';
 import 'package:go_parent/Screen/profile_screen.dart';
-import 'package:go_parent/Screen/prototypeMissionGraph.dart';
 import 'package:go_parent/Screen/view%20profile/viewprofile.dart';
 import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
+import 'package:go_parent/screens/home_page/dashboard_screen.dart';
 import 'package:go_parent/screens/mission_page/mission_screen.dart';
-import 'package:go_parent/widgets/side_menu.dart';
 
 class Homescreen extends StatefulWidget {
   final String username;
@@ -34,9 +30,7 @@ class _HomescreenState extends State<Homescreen> {
   @override
   Widget build(BuildContext context) {
     final cont = Get.put(NavigationController(username: widget.username, userId: widget.userId));
-
     return Scaffold(
-      // Bottom Navigation Bar
       bottomNavigationBar: Obx(
         () => NavigationBar(
             height: 80,
@@ -48,17 +42,9 @@ class _HomescreenState extends State<Homescreen> {
               NavigationDestination(icon: Icon(Icons.task_rounded), label: "Missions"),
               NavigationDestination(icon: Icon(Icons.photo_album), label: "Gallery"),
               NavigationDestination(icon: Icon(Icons.person_2_rounded), label: "Profile"),
-
             ]),
       ),
 
-      // // AppBar
-      // appBar: AppBar(title: const Text("Home")),
-
-      // Drawer
-      drawer: SideMenu(username: widget.username),
-
-      // Body
       body: Obx(() {
         return IndexedStack(
           index: cont.selectedIndex.value,
@@ -70,6 +56,7 @@ class _HomescreenState extends State<Homescreen> {
 }
 
 
+
 class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
   final String username;
@@ -79,14 +66,13 @@ class NavigationController extends GetxController {
 
   void onDestinationSelected(int index) {
     selectedIndex.value = index;
-    // Refresh the selected screen by recreating it with a new key
     screens[index] = _getScreen(index);
   }
 
   Widget _getScreen(int index) {
     switch (index) {
       case 0:
-        return Logout(username: username, userId: userId, key: UniqueKey());
+        return Dashboard(key: UniqueKey());
       case 1:
         return MissionScreen(key: UniqueKey());
       case 2:
@@ -107,84 +93,5 @@ class NavigationController extends GetxController {
       _getScreen(2),
       _getScreen(3),
     ];
-  }
-}
-
-
-
-// Dashboard widget for Missions
-class MissionDashboard extends StatelessWidget {
-  const MissionDashboard({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Example dummy mission data for the dashboard
-    int currentScore = 120;
-    int completedMissions = 5;
-
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-        ),
-        elevation: 5,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Mission Dashboard',
-                style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Current Score:',
-                    style: TextStyle(fontSize: 18, color: Colors.green[700]),
-                  ),
-                  Text(
-                    '$currentScore',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Completed Missions:',
-                    style: TextStyle(fontSize: 18, color: Colors.green[700]),
-                  ),
-                  Text(
-                    '$completedMissions',
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              const Divider(),
-              const SizedBox(height: 16),
-              const Text(
-                'Mission Progress:',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              LinearProgressIndicator(
-                value: completedMissions / 10,
-                backgroundColor: Colors.green[100],
-                valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }

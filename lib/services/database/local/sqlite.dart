@@ -109,7 +109,6 @@ class DatabaseService {
         FOREIGN KEY (userId) REFERENCES userdb(userId)
       )
     ''');
-
   }
 
 Future<void> listTables() async {

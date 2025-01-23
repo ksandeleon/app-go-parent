@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
+import 'package:go_parent/screens/home_page/dashboard_screen.dart';
 import 'package:go_parent/services/database/firebase_options.dart';
 import 'package:go_parent/screens/login_page/login_screen.dart';
 import 'package:go_parent/screens/login_page/password_recovery_screen.dart';
@@ -30,24 +31,10 @@ void main() async {
     databaseFactory = databaseFactoryFfi;
   }
 
-  // Delete old database files (optional, for cleanup)
-  await deleteDatabase(join(await getDatabasesPath(), 'goparent_v2.db'));
-  await deleteDatabase(join(await getDatabasesPath(), 'goparent_v3.db'));
-
   await DatabaseService.instance.database;
 
   SystemChrome.setSystemUIOverlayStyle(
       SystemUiOverlayStyle(statusBarColor: Colors.black));
-
-  // doWhenWindowReady(() {
-  //   final win = appWindow;
-  //   const desktopSize = Size(1200, 900);
-  //   win.alignment = Alignment.center;
-  //   win.size = desktopSize;
-  //   win.minSize = desktopSize;
-  //   win.maxSize = desktopSize;
-  //   win.show();
-  // });
 
   runApp(const MyApp());
 }
@@ -74,6 +61,7 @@ class MyApp extends StatelessWidget {
         // PasswordRecovery.id: (context) => PasswordRecovery(), //password_recovery_screen
         MissionScreen.id: (context) => MissionScreen(), //mission_screen
         GalleryScreen.id: (context) => GalleryScreen(), //gallery_screen
+        Dashboard.id: (context) => Dashboard(), //dashboard_screen
         // CollageScreen.id:
       },
     );

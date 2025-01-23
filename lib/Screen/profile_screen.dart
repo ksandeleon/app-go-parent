@@ -4,7 +4,6 @@ import 'package:go_parent/Beta%20Testing%20Folder/note_screen.dart';
 import 'package:go_parent/Screen/childcare.dart';
 import 'package:go_parent/Screen/view%20profile/viewprofile.dart';
 import 'package:sqflite/sqflite.dart';
-
 import '../services/database/local/helpers/user_helper.dart';
 import '../services/database/local/models/user_model.dart';
 
@@ -30,18 +29,6 @@ class _LogoutState extends State<Logout> {
   @override
   void initState() {
     super.initState();
-    _loadUser();
-  }
-
-  void _loadUser() async {
-    final db = await openDatabase('goparent_v5.db');
-    _userHelper = UserHelper(db);
-    final userId = 1;
-    final user = await _userHelper.getUserById(userId);
-
-    setState(() {
-      _user = user;
-    });
   }
 
   @override

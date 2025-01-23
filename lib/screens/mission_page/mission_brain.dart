@@ -23,7 +23,6 @@ class MissionBrain {
 
   List<MissionModel> get missions => _missions;
 
-  //Missions funcions
   final ImagePicker _picker = ImagePicker();
 
   Future<bool> completeMission(int userId, int missionId) async {

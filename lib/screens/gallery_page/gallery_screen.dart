@@ -1,20 +1,15 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_parent/screens/gallery_page/collage_creator_screen.dart';
 import 'package:go_parent/screens/gallery_page/collage_screen.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
-import 'package:go_parent/services/database/local/models/collage_model.dart';
-import 'package:go_parent/services/database/local/models/colllage_pictures_model.dart';
 import 'package:intl/intl.dart';
 import 'package:go_parent/screens/gallery_page/gallery_brain.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
 import 'package:go_parent/services/database/local/models/pictures_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 

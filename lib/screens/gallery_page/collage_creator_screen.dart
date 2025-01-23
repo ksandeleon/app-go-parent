@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:go_parent/screens/gallery_page/collage_screen.dart';
 import 'package:go_parent/screens/gallery_page/gallery_brain.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
@@ -12,7 +11,6 @@ import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'dart:ui' as ui;
 import 'dart:typed_data';
-import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/rendering.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';

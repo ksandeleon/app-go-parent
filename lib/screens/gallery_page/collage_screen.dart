@@ -1,18 +1,12 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
 import 'package:go_parent/services/database/local/models/collage_model.dart';
-import 'package:go_parent/services/database/local/models/colllage_pictures_model.dart';
-import 'package:intl/intl.dart';
 import 'package:go_parent/screens/gallery_page/gallery_brain.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
-import 'package:go_parent/services/database/local/models/pictures_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path_provider/path_provider.dart';
@@ -80,27 +74,6 @@ class _CollageScreenState extends State<CollageScreen> {
     }
   }
 
-  Future<void> _saveCollage(String collagePath) async {
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-      final targetPath = Directory('${directory.path}/GoParentCollages');
-      if (!targetPath.existsSync()) {
-        targetPath.createSync(recursive: true);
-      }
-      final fileName = collagePath.split('/').last;
-      final newFilePath = '${targetPath.path}/$fileName';
-      final collageFile = File(collagePath);
-      await collageFile.copy(newFilePath);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Collage saved to $newFilePath')),
-      );
-    } catch (e) {
-      debugPrint('Error saving collage: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save collage')),
-      );
-    }
-  }
 
 void _showSaveCollageDialog(String collagePath) {
   Alert(
