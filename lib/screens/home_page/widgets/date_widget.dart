@@ -70,7 +70,7 @@ class _DateWidgetState extends State<DateWidget> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                "Hey Parent, Let's Make Today Count!",
+                                "Hey Parent, Let's Make This Month Count!",
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
                               ),
                               Text(
