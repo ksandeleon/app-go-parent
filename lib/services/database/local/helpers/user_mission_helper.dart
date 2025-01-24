@@ -3,9 +3,15 @@ import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserMissionHelper {
-  static final UserMissionHelper _instance = UserMissionHelper._internal();
-  factory UserMissionHelper() => _instance;
-  UserMissionHelper._internal();
+  // static final UserMissionHelper _instance = UserMissionHelper._internal();
+  // factory UserMissionHelper() => _instance;
+  // UserMissionHelper._internal();
+
+  final Database db;
+
+  UserMissionHelper(this.db);
+
+
 
   // Table name constant to ensure consistency
   static const String tableName = 'usermissionsdb';
@@ -50,7 +56,7 @@ class UserMissionHelper {
     final db = await DatabaseService.instance.database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
-      where: 'userId = ?',
+      where: 'userId = ? AND isCompleted',
       whereArgs: [userId],
     );
     return maps.map((map) => UserMission.fromMap(map)).toList();

@@ -58,7 +58,7 @@ class _MissionScreenState extends State<MissionScreen> {
     final missionHelper = MissionHelper(db);
     final pictureHelper = PictureHelper(db);
     final babyHelper = BabyHelper(db);
-    final userMissionHelper = UserMissionHelper();
+    final userMissionHelper = UserMissionHelper(db);
 
     _missionBrain = MissionBrain(missionHelper, babyHelper, pictureHelper, userMissionHelper);
 
