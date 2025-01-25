@@ -119,6 +119,9 @@ class _ChildcareState extends State<Childcare> {
           ),
           const SizedBox(height: 24),
 
+
+
+
           // Categories grid
           GridView.builder(
             shrinkWrap: true,
@@ -174,6 +177,8 @@ class _ChildcareState extends State<Childcare> {
               );
             },
           ),
+
+
         ],
       ),
       floatingActionButton: FloatingActionButton(

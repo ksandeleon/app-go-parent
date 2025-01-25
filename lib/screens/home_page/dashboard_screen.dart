@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:go_parent/Beta%20Testing%20Folder/Beta.dart';
+import 'package:go_parent/Screen/childcare.dart';
 import 'package:go_parent/screens/home_page/dashboard_brain.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
@@ -31,6 +33,54 @@ class _DashboardState extends State<Dashboard> {
   final _userid = UserSession().userId;
   String username = "";
   int? touchedIndex;
+
+    final List<Map<String, dynamic>> categories = [
+    {
+      'title': 'Nutrition & Feeding',
+      'icon': Icons.restaurant,
+      'color': Colors.orange,
+      'tips': [
+        'Breastfeed exclusively for first 6 months if possible',
+        'Introduce solid foods gradually after 6 months',
+        'Always sterilize bottles and feeding equipment',
+        'Watch for food allergies when introducing new foods',
+      ]
+    },
+    {
+      'title': 'Sleep & Rest',
+      'icon': Icons.bedtime,
+      'color': Colors.indigo,
+      'tips': [
+        'Newborns sleep 16-17 hours per day',
+        'Establish consistent bedtime routines',
+        'Put baby to sleep on their back',
+        'Maintain optimal room temperature (68-72°F)',
+      ]
+    },
+    {
+      'title': 'Health & Safety',
+      'icon': Icons.health_and_safety,
+      'color': Colors.red,
+      'tips': [
+        'Schedule regular pediatric check-ups',
+        'Keep vaccinations up to date',
+        'Learn infant CPR and first aid',
+        'Childproof your home thoroughly',
+      ]
+    },
+    {
+      'title': 'Development',
+      'icon': Icons.child_care,
+      'color': Colors.green,
+      'tips': [
+        'Engage in daily tummy time',
+        'Read books together daily',
+        'Encourage play and exploration',
+        'Monitor developmental milestones',
+      ]
+    },
+  ];
+
 
   @override
   void initState() {
@@ -151,6 +201,64 @@ class _DashboardState extends State<Dashboard> {
       return Container();
     }
 
+
+  void _showCategoryDetails(BuildContext context, Map<String, dynamic> category) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(category['icon'], color: category['color']),
+                  const SizedBox(width: 12),
+                  Text(
+                    category['title'],
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              ...category['tips']
+                  .map<Widget>((tip) => Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.check_circle,
+                                color: category['color'], size: 20),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                tip,
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ))
+                  .toList(),
+              const SizedBox(height: 40),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+
+
   return Scaffold(
     backgroundColor: Colors.grey[100],
     appBar: AppBar(
@@ -168,8 +276,12 @@ class _DashboardState extends State<Dashboard> {
       actions: [
         IconButton(
           icon: const Icon(Icons.notifications_outlined, color: Colors.black87),
-          onPressed: () async {
-            //testing here
+          onPressed: ()  {
+
+            Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Childcare()),
+            );
 
           }
         ),
@@ -185,7 +297,7 @@ class _DashboardState extends State<Dashboard> {
             child: Column(
               children: [
 
-                 // feature 1, welcome header
+                // feature 1, welcome header
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
@@ -224,16 +336,18 @@ class _DashboardState extends State<Dashboard> {
                 ),
                 SizedBox(height: 30,),
 
+
+                // //feature 2 date
+                Center(child: DateWidget()),
+                SizedBox(height: 50,),
+
+
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Column(
-                      //crossAxisAlignment: CrossAxisAlignment.start,
+
                       children: [
-
-
-                        // //feature 2 date
-                        Center(child: DateWidget()),
-                        SizedBox(height: 50,),
 
 
                         //feature 3, activity history
@@ -246,6 +360,7 @@ class _DashboardState extends State<Dashboard> {
                               color:  Color(0xFFF2EFE7),
                               child: Padding(
                                 padding: const EdgeInsets.all(12.0),
+
                                 child: Card(
                                   child: DefaultTabController(length: 2, child: Column(
                                     children: [
@@ -400,47 +515,119 @@ class _DashboardState extends State<Dashboard> {
                                                 ),
                                                 SizedBox(
                                                   width: 30,
-                                                )
-                                              ],
-                                            ),
-                                          );
-                                        }
-                                      },
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ),
-
-                                    ],
-                                  )),
-                                ),
-                              )
-                            ),
-                          ),
-                        ),
-
-
-
-
-                    ],
                                   ),
-
-                    // Expanded(
-                    //     child: Container(
-                    //       color: Colors.red,
-                    //     ),
-                    // )
+                                ],
+                              )),
+                            ),
+                          )
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ],
-            ),
+
+
+                //feature 4
+                  SizedBox(
+                    width: 800,
+                    height: 400,
+                    child:
+                    Card(
+                      elevation: 8,
+                      color:  Color(0xFFF2EFE7),
+                      child: Padding(
+                          padding: const EdgeInsets.only(
+                            top: 12.0,
+                            bottom: 12.0,
+                            right: 36.0,
+                            left: 36.0,
+                          ),
+                        child: Column(
+                          children: [
+
+                            Center(
+                              child: Row(
+                                children: [
+                                  Icon(Icons.tips_and_updates, color: Colors.black45),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "Parenting Compass",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 25,),
+
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: categories.length,
+                                itemBuilder: (context, index) {
+                                  final category = categories[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    child:
+
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white, //change this when hovered
+                                        padding: EdgeInsets.symmetric(vertical: 20.0), // Further increased height
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(12), // Circular border
+                                        ),
+                                      ),
+                                      onPressed: () => _showCategoryDetails(context, category),
+                                      child: Row(
+                                        children: [
+                                          SizedBox(width: 16), // Padding before the icon
+                                          Icon(
+                                            category['icon'],
+                                            color: category['color'],
+                                            size: 30, // Slightly larger icon size
+                                          ),
+                                          SizedBox(width: 16),
+                                          Text(
+                                            category['title'],
+                                            style: TextStyle(
+                                              color: Colors.black, //change this when hovered
+                                              fontSize: 16, // Slightly larger font size for title
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+
+                          ]
+                        ),
+                      ),
+                    ),
+                  ),
+
+
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
-
-
-
-
   }
 
 
