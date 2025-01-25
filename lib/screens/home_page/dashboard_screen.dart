@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:go_parent/Beta%20Testing%20Folder/Beta.dart';
 import 'package:go_parent/Screen/childcare.dart';
 import 'package:go_parent/screens/home_page/dashboard_brain.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
@@ -11,7 +10,6 @@ import 'package:go_parent/services/database/local/helpers/user_mission_helper.da
 import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/services/database/local/models/user_mission_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
-import 'package:go_parent/utilities/constants.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
@@ -294,91 +292,131 @@ class _DashboardState extends State<Dashboard> {
       : SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
 
-                // feature 1, welcome header
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Colors.teal[400]!, Colors.teal[600]!],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Row(
-                    children: [
-                      const SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Welcome Back,',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
-                            ),
-                          ),
-                          Text(
-                            username,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
+                  // feature 1, welcome header
+                  Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [Colors.teal[400]!, Colors.teal[600]!],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                    ],
-                  ),
-                ),
-                SizedBox(height: 30,),
-
-
-                // //feature 2 date
-                Center(child: DateWidget()),
-                SizedBox(height: 50,),
-
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Column(
-
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Row(
                       children: [
+                        const SizedBox(width: 16),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Welcome Back,',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                              ),
+                            ),
+                            Text(
+                              username,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 30,),
 
 
-                        //feature 3, activity history
-                        Center(
-                          child: SizedBox(
-                            width: 800,
-                            height: 400,
-                            child: Card(
-                              elevation: 8,
-                              color:  Color(0xFFF2EFE7),
-                              child: Padding(
-                                padding: const EdgeInsets.all(12.0),
+                  // //feature 2 date
+                  Center(child: DateWidget()),
+                  SizedBox(height: 50,),
 
-                                child: Card(
-                                  child: DefaultTabController(length: 2, child: Column(
-                                    children: [
-                                      TabBar(tabs:
-                                      [
-                                        Tab(text: "My Recent Activities"),
-                                        Tab(text: "My Activity Analytics"),
-                                      ], labelColor: Colors.white,
-                                        unselectedLabelColor: Colors.black54,
-                                        indicator: BoxDecoration(
-                                          color: Colors.teal,
-                                          borderRadius: BorderRadius.circular(12),
-                                        ),
-                                        indicatorSize: TabBarIndicatorSize.tab,
-                                        labelStyle: TextStyle(fontWeight: FontWeight.bold),),
 
-                                      Expanded(child: TabBarView(children: [
-                                        FutureBuilder(
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Column(
+
+                        children: [
+
+
+                          //feature 3, activity history
+                          Center(
+                            child: SizedBox(
+                              width: 650,
+                              height: 400,
+                              child: Card(
+                                elevation: 8,
+                                color:  Color(0xFFF2EFE7),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12.0),
+
+                                  child: Card(
+                                    child: DefaultTabController(length: 2, child: Column(
+                                      children: [
+                                        TabBar(tabs:
+                                        [
+                                          Tab(text: "My Recent Activities"),
+                                          Tab(text: "My Activity Analytics"),
+                                        ], labelColor: Colors.white,
+                                          unselectedLabelColor: Colors.black54,
+                                          indicator: BoxDecoration(
+                                            color: Colors.teal,
+                                            borderRadius: BorderRadius.circular(12),
+                                          ),
+                                          indicatorSize: TabBarIndicatorSize.tab,
+                                          labelStyle: TextStyle(fontWeight: FontWeight.bold),),
+
+                                        Expanded(child: TabBarView(children: [
+                                          FutureBuilder(
+                                            future: getCompletedMissions(_userid),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState == ConnectionState.waiting) {
+                                                return Center(child: CircularProgressIndicator());
+                                              } else if (snapshot.hasError) {
+                                                return Center(child: Text('Error: ${snapshot.error}'));
+                                              } else {
+                                                // Safely access the data
+                                                final List<CompletedMissionDetail> theMissions = snapshot.data ?? [];
+                                                if (theMissions.isEmpty) {
+                                                  return Center(child: Text('No missions completed.'));
+                                                }
+
+                                                return ListView.builder(
+                                                  itemCount: theMissions.length,
+                                                  itemBuilder: (context, index) {
+                                                    theMissions.sort((a, b) {
+                                                    var aDate = DateTime.parse("${a.userMission.completedAt}");
+                                                    var bDate = DateTime.parse("${b.userMission.completedAt}");
+                                                    return bDate.compareTo(aDate); // For descending order
+                                                  });
+
+                                                  var mission = theMissions[index];
+                                                  String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(
+                                                    DateTime.parse("${mission.userMission.completedAt}")
+                                                  );
+                                                    return ListTile(
+                                                      title: Text("${mission.mission.title}",),
+                                                      subtitle: Text("Mission Category: ${mission.mission.category}"),
+                                                      trailing: Text("${formattedDate}", style: TextStyle(fontSize: 14),),
+                                                    );
+                                                  },
+                                                );
+                                              }
+                                            },
+                                          ),
+
+                                           // feature 3 Second Tab: Pie Chart
+                                          FutureBuilder(
                                           future: getCompletedMissions(_userid),
                                           builder: (context, snapshot) {
                                             if (snapshot.connectionState == ConnectionState.waiting) {
@@ -386,244 +424,206 @@ class _DashboardState extends State<Dashboard> {
                                             } else if (snapshot.hasError) {
                                               return Center(child: Text('Error: ${snapshot.error}'));
                                             } else {
-                                              // Safely access the data
-                                              final List<CompletedMissionDetail> theMissions = snapshot.data ?? [];
-                                              if (theMissions.isEmpty) {
-                                                return Center(child: Text('No missions completed.'));
+                                              final missions = snapshot.data ?? [];
+                                              if (missions.isEmpty) {
+                                                return Center(child: Text('You Haven\'t Completed Any Mission Yet.'));
                                               }
+                                             // Predefined colors for categories
+                                            final categoryColors = {
+                                              'Social': Colors.lightBlue,
+                                              'Creative': Colors.pink[400],
+                                              'Math': Colors.brown[400],
+                                              'Physical': Colors.orange[400],
+                                            };
+                                            // Calculate category counts
+                                            final categoryCounts = <String, int>{};
+                                            for (var mission in missions) {
+                                              categoryCounts[mission.mission.category] =
+                                                  (categoryCounts[mission.mission.category] ?? 0) + 1;
+                                            }
 
-                                              return ListView.builder(
-                                                itemCount: theMissions.length,
-                                                itemBuilder: (context, index) {
-                                                  theMissions.sort((a, b) {
-                                                  var aDate = DateTime.parse("${a.userMission.completedAt}");
-                                                  var bDate = DateTime.parse("${b.userMission.completedAt}");
-                                                  return bDate.compareTo(aDate); // For descending order
-                                                });
+                                            // Total number of missions
+                                            final totalMissions = categoryCounts.values.fold(0, (a, b) => a + b);
 
-                                                var mission = theMissions[index];
-                                                String formattedDate = DateFormat('yyyy-MM-dd HH:mm').format(
-                                                  DateTime.parse("${mission.userMission.completedAt}")
-                                                );
-                                                  return ListTile(
-                                                    title: Text("${mission.mission.title}",),
-                                                    subtitle: Text("Mission Category: ${mission.mission.category}"),
-                                                    trailing: Text("${formattedDate}", style: TextStyle(fontSize: 14),),
-                                                  );
-                                                },
+                                            // Generate Pie Chart sections
+                                            final pieSections = categoryCounts.entries.map((entry) {
+                                              final percentage = ((entry.value / totalMissions) * 100).toInt();
+                                              // final isTouched = touchedIndex == categoryCounts.keys.toList().indexOf(entry.key);
+                                              final radius =  50.0;
+
+                                              return PieChartSectionData(
+                                                color: categoryColors[entry.key],
+                                                value: entry.value.toDouble(),
+                                                title: "$percentage%",
+                                                radius: radius,
+                                                titleStyle: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
                                               );
-                                            }
-                                          },
-                                        ),
+                                            }).toList();
 
-                                         // feature 3 Second Tab: Pie Chart
-                                        FutureBuilder(
-                                        future: getCompletedMissions(_userid),
-                                        builder: (context, snapshot) {
-                                          if (snapshot.connectionState == ConnectionState.waiting) {
-                                            return Center(child: CircularProgressIndicator());
-                                          } else if (snapshot.hasError) {
-                                            return Center(child: Text('Error: ${snapshot.error}'));
-                                          } else {
-                                            final missions = snapshot.data ?? [];
-                                            if (missions.isEmpty) {
-                                              return Center(child: Text('You Haven\'t Completed Any Mission Yet.'));
-                                            }
-                                           // Predefined colors for categories
-                                          final categoryColors = {
-                                            'Social': Colors.lightBlue,
-                                            'Creative': Colors.pink[400],
-                                            'Math': Colors.brown[400],
-                                            'Physical': Colors.orange[400],
-                                          };
-                                          // Calculate category counts
-                                          final categoryCounts = <String, int>{};
-                                          for (var mission in missions) {
-                                            categoryCounts[mission.mission.category] =
-                                                (categoryCounts[mission.mission.category] ?? 0) + 1;
-                                          }
+                                            // Generate Legend
+                                            final legendItems = categoryCounts.entries.map((entry) {
+                                              return Row(
+                                                children: [
+                                                  Container(
+                                                    width: 16,
+                                                    height: 16,
+                                                    color: categoryColors[entry.key],
+                                                    margin: EdgeInsets.only(right: 8),
+                                                  ),
+                                                  Text(
+                                                    entry.key,
+                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                                  ),
+                                                ],
+                                              );
+                                            }).toList();
 
-                                          // Total number of missions
-                                          final totalMissions = categoryCounts.values.fold(0, (a, b) => a + b);
-
-                                          // Generate Pie Chart sections
-                                          final pieSections = categoryCounts.entries.map((entry) {
-                                            final percentage = ((entry.value / totalMissions) * 100).toInt();
-                                            // final isTouched = touchedIndex == categoryCounts.keys.toList().indexOf(entry.key);
-                                            final radius =  50.0;
-
-                                            return PieChartSectionData(
-                                              color: categoryColors[entry.key],
-                                              value: entry.value.toDouble(),
-                                              title: "$percentage%",
-                                              radius: radius,
-                                              titleStyle: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            );
-                                          }).toList();
-
-                                          // Generate Legend
-                                          final legendItems = categoryCounts.entries.map((entry) {
-                                            return Row(
-                                              children: [
-                                                Container(
-                                                  width: 16,
-                                                  height: 16,
-                                                  color: categoryColors[entry.key],
-                                                  margin: EdgeInsets.only(right: 8),
-                                                ),
-                                                Text(
-                                                  entry.key,
-                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                                ),
-                                              ],
-                                            );
-                                          }).toList();
-
-                                          return Padding(
-                                            padding: const EdgeInsets.all(16.0),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: PieChart(
-                                                    PieChartData(
-                                                      sections: pieSections,
-                                                      centerSpaceRadius: 40,
-                                                      sectionsSpace: 4,
-                                                      borderData: FlBorderData(show: false),
-                                                      startDegreeOffset: -90,
+                                            return Padding(
+                                              padding: const EdgeInsets.all(16.0),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: PieChart(
+                                                      PieChartData(
+                                                        sections: pieSections,
+                                                        centerSpaceRadius: 40,
+                                                        sectionsSpace: 4,
+                                                        borderData: FlBorderData(show: false),
+                                                        startDegreeOffset: -90,
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
-                                                // const SizedBox(height: 16),
-                                                Padding(
-                                                  padding: const EdgeInsets.all(8.0),
-                                                  child: Column(
-                                                    children: [
-                                                      Text("Mission Categories", style: TextStyle(fontWeight: FontWeight.bold),),
-                                                      SizedBox(height: 5,),
-                                                      Column(
-                                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                                        children:
-                                                        legendItems,
-                                                      ),
+                                                  // const SizedBox(height: 16),
+                                                  Padding(
+                                                    padding: const EdgeInsets.all(8.0),
+                                                    child: Column(
+                                                      children: [
+                                                        Text("Mission Categories", style: TextStyle(fontWeight: FontWeight.bold),),
+                                                        SizedBox(height: 5,),
+                                                        Column(
+                                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                                          children:
+                                                          legendItems,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 30,
+                                                      )
                                                     ],
                                                   ),
-                                                ),
-                                                SizedBox(
-                                                  width: 30,
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            }
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              )),
-                            ),
-                          )
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-
-                //feature 4
-                  SizedBox(
-                    width: 800,
-                    height: 400,
-                    child:
-                    Card(
-                      elevation: 8,
-                      color:  Color(0xFFF2EFE7),
-                      child: Padding(
-                          padding: const EdgeInsets.only(
-                            top: 12.0,
-                            bottom: 12.0,
-                            right: 36.0,
-                            left: 36.0,
-                          ),
-                        child: Column(
-                          children: [
-
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.tips_and_updates, color: Colors.black45),
-                                SizedBox(width: 8),
-                                Text(
-                                  "Parenting Compass",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 25,),
-
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: categories.length,
-                                itemBuilder: (context, index) {
-                                  final category = categories[index];
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                    child:
-
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white, //change this when hovered
-                                        padding: EdgeInsets.symmetric(vertical: 20.0), // Further increased height
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(12), // Circular border
-                                        ),
-                                      ),
-                                      onPressed: () => _showCategoryDetails(context, category),
-                                      child: Row(
-                                        children: [
-                                          SizedBox(width: 16), // Padding before the icon
-                                          Icon(
-                                            category['icon'],
-                                            color: category['color'],
-                                            size: 30, // Slightly larger icon size
-                                          ),
-                                          SizedBox(width: 16),
-                                          Text(
-                                            category['title'],
-                                            style: TextStyle(
-                                              color: Colors.black, //change this when hovered
-                                              fontSize: 16, // Slightly larger font size for title
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                                );
+                                              }
+                                            },
                                           ),
                                         ],
                                       ),
                                     ),
-                                  );
-                                },
+                                  ],
+                                )),
                               ),
-                            ),
-
-                          ]
+                            )
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
 
 
-                ],
-              ),
-            ],
-          ),
+                  //feature 4
+                    SizedBox(
+                      width: 650,
+                      height: 400,
+                      child:
+                      Card(
+                        elevation: 8,
+                        color:  Color(0xFFF2EFE7),
+                        child: Padding(
+                            padding: const EdgeInsets.only(
+                              top: 12.0,
+                              bottom: 12.0,
+                              right: 36.0,
+                              left: 36.0,
+                            ),
+                          child: Column(
+                            children: [
+
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.tips_and_updates, color: Colors.black45),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    "Parenting Compass",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 25,),
+
+                              Expanded(
+                                child: ListView.builder(
+                                  itemCount: categories.length,
+                                  itemBuilder: (context, index) {
+                                    final category = categories[index];
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                      child:
+
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.white, //change this when hovered
+                                          padding: EdgeInsets.symmetric(vertical: 20.0), // Further increased height
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(12), // Circular border
+                                          ),
+                                        ),
+                                        onPressed: () => _showCategoryDetails(context, category),
+                                        child: Row(
+                                          children: [
+                                            SizedBox(width: 16), // Padding before the icon
+                                            Icon(
+                                              category['icon'],
+                                              color: category['color'],
+                                              size: 30, // Slightly larger icon size
+                                            ),
+                                            SizedBox(width: 16),
+                                            Text(
+                                              category['title'],
+                                              style: TextStyle(
+                                                color: Colors.black, //change this when hovered
+                                                fontSize: 16, // Slightly larger font size for title
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                            ]
+                          ),
+                        ),
+                      ),
+                    ),
+
+
+                  ],
+                ),
+              ],
+                        ),
+            ),
         ),
       ),
     );

@@ -44,6 +44,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return 
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Go Profile',
+          style: TextStyle(
+            color: Colors.white
+          ),
+        ),
+      ),
+
+
+
+    );
   }
 }

@@ -146,34 +146,40 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) => Signup()));
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF009688),
-                        minimumSize: const Size(double.infinity, 50),
-                        foregroundColor: Colors.white,
-                        textStyle: TextStyle(
-                          color: Colors.white,
+                    SizedBox(
+                      width: 800,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) => Signup()));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Color(0xFF009688),
+                          minimumSize: const Size(double.infinity, 50),
+                          foregroundColor: Colors.white,
+                          textStyle: TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
+                        child: const Text('SIGN UP FOR FREE'),
                       ),
-                      child: const Text('SIGN UP FOR FREE'),
                     ),
                     const SizedBox(height: 20),
-                    TextButton(
-                     onPressed: () {
-                        Navigator.pushReplacementNamed(context, "login_screen") ;
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Color(0xFF009688), // Teal text color
-                        backgroundColor:
-                            Color(0xFFB2DFDB), // Background same as screen
-                        minimumSize: const Size(double.infinity, 50),
-                        padding: EdgeInsets.zero, // Flat button look
+                    SizedBox(
+                      width: 800,
+                      child: TextButton(
+                      onPressed: () {
+                          Navigator.pushReplacementNamed(context, "login_screen") ;
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Color(0xFF009688),
+                          backgroundColor:
+                              Color(0xFFB2DFDB),
+                          minimumSize: const Size(double.infinity, 50),
+                          padding: EdgeInsets.zero,
+                        ),
+                        child: const Text('SIGN IN'),
                       ),
-                      child: const Text('SIGN IN'),
                     ),
                   ],
                 ),
