@@ -11,7 +11,7 @@ import 'package:go_parent/services/database/firebase_options.dart';
 import 'package:go_parent/screens/login_page/login_screen.dart';
 import 'package:go_parent/screens/login_page/password_recovery_screen.dart';
 import 'package:go_parent/screens/signup_page/signup_screen.dart';
-import 'package:go_parent/Screen/profile_screen.dart';
+import 'package:go_parent/Screen/usedtobeprofilescreen.dart';
 import 'package:go_parent/screens/home_page/home_screen.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/widgets/side_menu.dart';

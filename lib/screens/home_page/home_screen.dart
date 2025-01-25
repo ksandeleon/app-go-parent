@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:go_parent/Screen/profile_screen.dart';
+import 'package:go_parent/Screen/usedtobeprofilescreen.dart';
 import 'package:go_parent/Screen/view%20profile/viewprofile.dart';
 import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
 import 'package:go_parent/screens/home_page/dashboard_screen.dart';
+import 'package:go_parent/screens/login_page/login_screen.dart';
 import 'package:go_parent/screens/mission_page/mission_screen.dart';
 
 class Homescreen extends StatefulWidget {
@@ -56,7 +57,6 @@ class _HomescreenState extends State<Homescreen> {
 }
 
 
-
 class NavigationController extends GetxController {
   final Rx<int> selectedIndex = 0.obs;
   final String username;
@@ -69,6 +69,7 @@ class NavigationController extends GetxController {
     screens[index] = _getScreen(index);
   }
 
+
   Widget _getScreen(int index) {
     switch (index) {
       case 0:
@@ -80,9 +81,10 @@ class NavigationController extends GetxController {
       case 3:
         return profileviewer(key: UniqueKey());
       default:
-        return Logout(username: username, userId: userId, key: UniqueKey());
+        return LoginPage1(key: UniqueKey());
     }
   }
+
 
   @override
   void onInit() {

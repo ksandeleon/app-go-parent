@@ -25,9 +25,9 @@ class _profileviewerState extends State<profileviewer> {
 
   @override
   void initState() {
-    // Initialize the BabyHelper instance
+
     super.initState();
-    userSession = UserSession(); // Ensure it's initialized
+    userSession = UserSession();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInfoDialog();
       initializeDatabase();
@@ -36,7 +36,7 @@ class _profileviewerState extends State<profileviewer> {
 
   void initializeDatabase() async {
     final database =
-        await openDatabase('goparent_v6.db'); // Replace with your database path
+        await openDatabase('goparent_v6.db');
     setState(() {
       _babyHelper = BabyHelper(database);
     });
@@ -92,6 +92,7 @@ class _profileviewerState extends State<profileviewer> {
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isSmallScreen = screenSize.width < 600;
+
 
     return Scaffold(
       backgroundColor: Color(0xFFF5F8FF),

@@ -69,10 +69,10 @@ class _DateWidgetState extends State<DateWidget> {
                           child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                "Parent, Let's Make This Month Count!",
-                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
-                              ),
+                              Text(
+  "Parent, Let's Make This ${DateFormat('MMMM').format(DateTime.now())} Count!",
+  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black),
+),
                               Text(
                                 '(GMT+8:00) ${DateFormat('M/d/yyyy h:mm:ss a').format(DateTime.now())}',
                                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.black45),
