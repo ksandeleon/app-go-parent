@@ -554,20 +554,19 @@ class _DashboardState extends State<Dashboard> {
                         child: Column(
                           children: [
 
-                            Center(
-                              child: Row(
-                                children: [
-                                  Icon(Icons.tips_and_updates, color: Colors.black45),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    "Parenting Compass",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.tips_and_updates, color: Colors.black45),
+                                SizedBox(width: 8),
+                                Text(
+                                  "Parenting Compass",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 20,
                                   ),
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                             SizedBox(height: 25,),
 
