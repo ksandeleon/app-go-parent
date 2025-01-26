@@ -252,7 +252,7 @@ class _MissionScreenState extends State<MissionScreen> {
                                       Alert(
                                         context: context,
                                         type: AlertType.success,
-                                        title: "Missions Loaded",
+                                        title: "Missions Updated Successfully!",
                                         desc: "Loaded missions curated for baby $firstBabyName.",
                                         buttons: [
                                           DialogButton(
@@ -414,9 +414,6 @@ class _MissionScreenState extends State<MissionScreen> {
     );
   }
 }
-
-
-
 class MissionWithStatus {
   final MissionModel mission;
   bool isCompleted;

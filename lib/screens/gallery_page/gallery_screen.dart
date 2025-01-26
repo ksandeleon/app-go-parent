@@ -138,7 +138,7 @@ Widget build(BuildContext context) {
             body: TabBarView(
               children: [
                 pictures.isEmpty
-                ? const Center(child: Text('No pictures found' ,style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)) // Show message when no pictures
+                ? const Center(child: Text('You have no photos yet.. Lets Complete A Mission First' ,style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),)) // Show message when no pictures
                 : Stack(
                   children: [
                     GridView.builder(
