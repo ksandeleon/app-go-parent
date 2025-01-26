@@ -771,6 +771,31 @@ Widget _buildColorPicker() {
             ),
           ),
           Positioned(
+            bottom:20 ,
+            left: 0,
+            right: 0,
+            child: Tooltip(
+              message: "You Can CLick on the Individual Photos to Show the Edit Menu!",
+              child: Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.info_outline, color: Colors.teal,size: 35,),
+                    SizedBox(width: 5,),
+                    Text("Click on the Photos to Customize the Collage Further!",
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18
+
+                  ),),
+                        ]
+                ),
+              ),
+            ),
+            ),
+          Positioned(
             right: 0,
             top: (MediaQuery.of(context).size.height * 0.2) ,
             child: _buildColorPicker(),

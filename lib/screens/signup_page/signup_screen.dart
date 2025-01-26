@@ -646,7 +646,7 @@ GoParentApp Team
                                           message:
                                               'Dont worry parent! you can add your other children on your profile page inside the app',
                                           decoration: BoxDecoration(
-                                            color: Colors.purple,
+                                            color: Colors.teal,
                                             borderRadius:
                                                 BorderRadius.circular(8),
                                           ),

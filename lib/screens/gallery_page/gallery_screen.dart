@@ -4,6 +4,7 @@ import 'package:go_parent/screens/gallery_page/collage_creator_screen.dart';
 import 'package:go_parent/screens/gallery_page/collage_screen.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
+import 'package:go_parent/utilities/constants.dart';
 import 'package:intl/intl.dart';
 import 'package:go_parent/screens/gallery_page/gallery_brain.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
@@ -85,7 +86,7 @@ Widget build(BuildContext context) {
       backgroundColor: Colors.teal,
       title: isSelectMode
         ? Text(
-            '${selectedPictureIds.length} Selected',
+            '${selectedPictureIds.length}/6 Selected',
             style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
           )
         : const Text(
@@ -131,6 +132,7 @@ Widget build(BuildContext context) {
                   Tab(text: 'Joyful Pictures', icon: Icon(Icons.image)),
                   Tab(text: 'Memory Collage', icon: Icon(Icons.grid_on)),
                 ],
+
               ),
             ),
             body: TabBarView(
@@ -257,6 +259,7 @@ Widget build(BuildContext context) {
                       child: Tooltip(
                         message: isSelectMode ? "Continue" : "Create Collage",
                         child: FloatingActionButton(
+                          elevation: 12,
                           backgroundColor: Colors.teal,
                           onPressed: () {
                             if (isSelectMode) {

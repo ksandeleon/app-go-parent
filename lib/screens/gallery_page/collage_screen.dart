@@ -78,39 +78,41 @@ class _CollageScreenState extends State<CollageScreen> {
 void _showSaveCollageDialog(String collagePath) {
   Alert(
     context: context,
-    title: "Choose an Option",
-    content: Text("What would you like to do with this collage?"),
+    title: "What would you like to do",
+    content: Text("Would you like to share this collage?"),
     buttons: [
       DialogButton(
         child: Text(
-          "Save",
+          "Close",
           style: TextStyle(color: Colors.white),
         ),
-        onPressed: () async {
-          try {
-            final directory = await getApplicationDocumentsDirectory();
-            final targetPath = Directory('${directory.path}/GoParentCollages');
-            if (!await targetPath.exists()) {
-              await targetPath.create(recursive: true);
-            }
+        onPressed: () {
+          // try {
+          //   final directory = await getApplicationDocumentsDirectory();
+          //   final targetPath = Directory('${directory.path}/GoParentCollages');
+          //   if (!await targetPath.exists()) {
+          //     await targetPath.create(recursive: true);
+          //   }
 
-            final fileName = collagePath.split('/').last;
-            final savedPath = '${targetPath.path}/$fileName';
-            final File originalFile = File(collagePath);
-            await originalFile.copy(savedPath);
+          //   final fileName = collagePath.split('/').last;
+          //   final savedPath = '${targetPath.path}/$fileName';
+          //   final File originalFile = File(collagePath);
+          //   await originalFile.copy(savedPath);
 
-            Navigator.pop(context); // Close the dialog
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Collage saved to $savedPath")),
-            );
-          } catch (e) {
-            Navigator.pop(context); // Close the dialog
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Failed to save collage: $e")),
-            );
-          }
+          //   Navigator.pop(context); // Close the dialog
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text("Collage saved to $savedPath")),
+          //   );
+          // } catch (e) {
+          //   Navigator.pop(context); // Close the dialog
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(content: Text("Failed to save collage: $e")),
+          //   );
+          // }
+          Navigator.pop(context); // Close the dialog
         },
-        color: Colors.teal,
+
+        color: Colors.red,
       ),
       DialogButton(
         child: Text(
@@ -119,12 +121,18 @@ void _showSaveCollageDialog(String collagePath) {
         ),
         onPressed: () async {
           Navigator.pop(context); // Close the dialog
-          try {
-            await Share.shareXFiles([XFile('${collagePath}')], text: "Check out my collage!");
-          } catch (e) {
+          if (Platform.isLinux) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("Failed to share collage: $e")),
+              SnackBar(content: Text("Sorry Parent, Sharing is not yet supported on Linux.")),
             );
+          } else {
+            try {
+              await Share.shareXFiles([XFile('${collagePath}')], text: "Check out my collage!");
+            } catch (e) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Failed to share collage: $e")),
+              );
+            }
           }
         },
         color: Colors.blue,
