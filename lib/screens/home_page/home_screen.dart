@@ -6,6 +6,7 @@ import 'package:go_parent/screens/gallery_page/gallery_screen.dart';
 import 'package:go_parent/screens/home_page/dashboard_screen.dart';
 import 'package:go_parent/screens/login_page/login_screen.dart';
 import 'package:go_parent/screens/mission_page/mission_screen.dart';
+import 'package:go_parent/screens/profile_page/profile_screen.dart';
 
 class Homescreen extends StatefulWidget {
   final String username;

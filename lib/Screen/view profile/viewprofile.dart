@@ -4,9 +4,13 @@ import 'package:get/get.dart';
 import 'package:go_parent/Screen/view%20profile/addBabyScreen.dart';
 import 'package:go_parent/Screen/view%20profile/profile_viewer_editor.dart';
 import 'package:go_parent/Screen/view%20profile/updateBabyInfo.dart';
+import 'package:go_parent/screens/profile_page/profile_brain.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
+import 'package:go_parent/services/database/local/helpers/user_helper.dart';
+import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../../services/database/local/models/baby_model.dart';
 
@@ -20,8 +24,10 @@ class profileviewer extends StatefulWidget {
 class _profileviewerState extends State<profileviewer> {
   BabyHelper? _babyHelper;
   BabyModel? baby;
+  late ProfileBrain profileBrain;
   late UserSession userSession;
   List<BabyModel> babies = [];
+  Color colorbeige = Color(0xFFF2EFE7);
 
   @override
   void initState() {
@@ -31,8 +37,23 @@ class _profileviewerState extends State<profileviewer> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _showInfoDialog();
       initializeDatabase();
+      initProfileBrain();
     });
   }
+
+    void initProfileBrain () async {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+
+    final dbService = DatabaseService.instance;
+    final db = await dbService.database;
+
+    final babyHelper = BabyHelper(db);
+    final userHelper = UserHelper(db);
+
+    profileBrain = ProfileBrain(userHelper, babyHelper);
+  }
+
 
   void initializeDatabase() async {
     final database =
@@ -74,7 +95,7 @@ class _profileviewerState extends State<profileviewer> {
         return AlertDialog(
           title: Text("Information"),
           content: Text(
-              "All information here are optional to put. We do not require you to put any personal information."),
+              "Hey Parent, Your Information is Safe with Us. We do not require you to put any sensitive information."),
           actions: [
             TextButton(
               onPressed: () {
@@ -88,6 +109,93 @@ class _profileviewerState extends State<profileviewer> {
     );
   }
 
+  Widget _buildChildCard({
+  required String name,
+  required String age,
+  required int index,
+}) {
+  return Container(
+    width: 120,
+    margin: const EdgeInsets.only(right: 16),
+    decoration: BoxDecoration(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(12),
+      boxShadow: [
+        BoxShadow(
+          color: Colors.grey.withOpacity(0.2),
+          spreadRadius: 1,
+          blurRadius: 5,
+          offset: Offset(0, 3),
+        ),
+      ],
+    ),
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(height: 16),
+        Stack(
+          children: [
+            Container(
+              width: 80,
+              height: 80,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: colorbeige,
+                  width: 3,
+                ),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.child_care,
+                  size: 50,
+                  color: Colors.teal[200],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: Colors.teal,
+                  shape: BoxShape.circle,
+                ),
+                child: Text(
+                  '$index',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 8),
+        Text(
+          name,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF2E3E5C),
+          ),
+        ),
+        Text(
+          age,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey,
+          ),
+        ),
+        SizedBox(height: 16),
+      ],
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
@@ -97,39 +205,43 @@ class _profileviewerState extends State<profileviewer> {
     return Scaffold(
       backgroundColor: Color(0xFFF5F8FF),
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.teal,
         title: Text(
-          'Family Profile',
+          'Go Profile',
           style: TextStyle(
-            color: Color(0xFF2E3E5C),
+            color: Colors.white,
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.edit, color: Color(0xFF2E3E5C)),
-            onPressed: () {
-              Navigator.push(
-                context,
-                PageRouteBuilder(
-                  pageBuilder: (context, animation, secondaryAnimation) =>
-                      NewBabyScreen(),
-                  transitionsBuilder:
-                      (context, animation, secondaryAnimation, child) {
-                    return FadeTransition(opacity: animation, child: child);
-                  },
-                ),
-              );
-            },
-          ),
-        ],
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(Icons.edit, color: Color(0xFF2E3E5C)),
+        //     onPressed: () {
+        //       Navigator.push(
+        //         context,
+        //         PageRouteBuilder(
+        //           pageBuilder: (context, animation, secondaryAnimation) =>
+        //               NewBabyScreen(),
+        //           transitionsBuilder:
+        //               (context, animation, secondaryAnimation, child) {
+        //             return FadeTransition(opacity: animation, child: child);
+        //           },
+        //         ),
+        //       );
+        //     },
+        //   ),
+        // ],
       ),
+
+
       body: SingleChildScrollView(
         child: Column(
           children: [
+
             // Parent Profile Section
             Container(
+              margin: EdgeInsets.symmetric(horizontal: 32),
               width: double.infinity,
               decoration: BoxDecoration(
                 color: Colors.white,
@@ -145,50 +257,33 @@ class _profileviewerState extends State<profileviewer> {
                   ),
                 ],
               ),
+
               child: Column(
                 children: [
-                  SizedBox(height: 20),
+                  SizedBox(height: 10),
                   // Parent Profile Picture
-                  Stack(
-                    children: [
-                      Container(
-                        width: 120,
-                        height: 120,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: Color(0xFF9CC4FF),
-                            width: 3,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(60),
-                          child: Image.asset(
-                            'assets/images/tristanaa.jpg',
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Color(0xFF9CC4FF),
+                        width: 3,
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: Color(0xFF4B8EFF),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.family_restroom,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ),
+                      color: Colors.teal, // Optional: Add a background color
+                    ),
+                    child: Center(
+                      child: Icon(
+                        Icons.family_restroom,
+                        color: Colors.white,
+                        size: 60, // Adjust the size of the icon as needed
                       ),
-                    ],
+                    ),
                   ),
-                  SizedBox(height: 16),
-                  // Parent Name
+
+                  SizedBox(height: 8),
+
                   Text(
                     'Hero',
                     style: TextStyle(
@@ -197,18 +292,20 @@ class _profileviewerState extends State<profileviewer> {
                       color: Color(0xFF2E3E5C),
                     ),
                   ),
+
                   SizedBox(height: 8),
                   // Parent Type
                   Container(
                     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: Color(0xFF4B8EFF).withOpacity(0.1),
+                      color: colorbeige,
                       borderRadius: BorderRadius.circular(20),
                     ),
+
                     child: Text(
-                      'Primary Parent',
+                      'Loving Parent',
                       style: TextStyle(
-                        color: Color(0xFF4B8EFF),
+                        color: Colors.teal,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -227,7 +324,7 @@ class _profileviewerState extends State<profileviewer> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'hero',
+                    'My Children',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -235,18 +332,22 @@ class _profileviewerState extends State<profileviewer> {
                     ),
                   ),
                   SizedBox(height: 16),
+
+
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: Row(
+                    child:  Row(
                       children: [
-                        ...babies.map((baby) => _buildChildCard(
+                        ...babies.asMap().entries.map((entry) {
+                          final index = entry.key + 1; // Adding 1 to start from 1 instead of 0
+                          final baby = entry.value;
+                          return Tooltip(
+                            message: "Edit Baby Information",
+                            child: GestureDetector(
                               onTap: () async {
-                                // Ensure baby is assigned properly before use
                                 final babyId = baby.babyId;
                                 if (babyId != null) {
-                                  // You can either fetch the full baby data here
-                                  final babyDetails =
-                                      await _babyHelper?.getBabyById(babyId);
+                                  final babyDetails = await _babyHelper?.getBabyById(babyId);
                                   if (babyDetails != null) {
                                     Navigator.push(
                                       context,
@@ -261,24 +362,29 @@ class _profileviewerState extends State<profileviewer> {
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content:
-                                          Text('Could not find baby details'),
+                                      content: Text('Could not find baby details'),
                                       backgroundColor: Colors.red,
                                     ),
                                   );
                                 }
                               },
-                              name: baby.babyName ?? 'Unnamed',
-                              age: baby.babyAge?.toString() ?? 'N/A',
-                              imagePath: 'assets/images/tristanaa.jpg',
-                            )),
+
+                              child: _buildChildCard(
+                                name: baby.babyName ?? 'Unnamed',
+                                age: baby.babyGender ?? 'N/A',
+                                index: index,
+                              ),
+                                  ),
+                          );}
+                        ),
+
+
                         Container(
                           width: 120,
                           margin: const EdgeInsets.only(right: 16),
                           child: ElevatedButton(
                             onPressed: () {
                               Navigator.push(
-                                // Add proper navigation
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => NewBabyScreen(),
@@ -297,6 +403,8 @@ class _profileviewerState extends State<profileviewer> {
                                     const BorderSide(color: Color(0xFF4B8EFF)),
                               ),
                             ),
+
+
                             child: const Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -311,6 +419,8 @@ class _profileviewerState extends State<profileviewer> {
                     ),
                   ),
                   SizedBox(height: 24),
+
+
 
                   // Family Information Cards
                   _buildFamilyInfoCard(
@@ -394,62 +504,62 @@ class _profileviewerState extends State<profileviewer> {
     );
   }
 
-// ORIGGGGGGGGG
-  Widget _buildChildCard({
-    required void Function() onTap,
-    required String name,
-    required String age,
-    required String imagePath,
-  }) {
-    return GestureDetector(
-      // Add this to make it tappable
-      onTap: onTap,
-      child: Container(
-        width: 120,
-        margin: const EdgeInsets.only(right: 16),
-        child: Column(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: const Color(0xFF9CC4FF),
-                  width: 2,
-                ),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(40),
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Icon(Icons.child_care, size: 40);
-                  },
-                ),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              name,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF2E3E5C),
-              ),
-            ),
-            Text(
-              age,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 12,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+// // ORIGGGGGGGGG
+//   Widget _buildChildCard({
+//     required void Function() onTap,
+//     required String name,
+//     required String age,
+//     required String imagePath,
+//   }) {
+//     return GestureDetector(
+//       // Add this to make it tappable
+//       onTap: onTap,
+//       child: Container(
+//         width: 120,
+//         margin: const EdgeInsets.only(right: 16),
+//         child: Column(
+//           children: [
+//             Container(
+//               width: 80,
+//               height: 80,
+//               decoration: BoxDecoration(
+//                 shape: BoxShape.circle,
+//                 border: Border.all(
+//                   color: const Color(0xFF9CC4FF),
+//                   width: 2,
+//                 ),
+//               ),
+//               child: ClipRRect(
+//                 borderRadius: BorderRadius.circular(40),
+//                 child: Image.asset(
+//                   imagePath,
+//                   fit: BoxFit.cover,
+//                   errorBuilder: (context, error, stackTrace) {
+//                     return const Icon(Icons.child_care, size: 40);
+//                   },
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(height: 8),
+//             Text(
+//               name,
+//               style: const TextStyle(
+//                 fontWeight: FontWeight.bold,
+//                 color: Color(0xFF2E3E5C),
+//               ),
+//             ),
+//             Text(
+//               age,
+//               style: TextStyle(
+//                 color: Colors.grey[600],
+//                 fontSize: 12,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
 
   Widget _buildFamilyInfoCard({
     required IconData icon,

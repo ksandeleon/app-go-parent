@@ -277,8 +277,8 @@ class _DashboardState extends State<Dashboard> {
           onPressed: ()  {
 
             Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Childcare()),
+                  context,
+                  MaterialPageRoute(builder: (context) => Childcare()),
             );
 
           }
@@ -301,7 +301,9 @@ class _DashboardState extends State<Dashboard> {
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
-                        colors: [Colors.teal[400]!, Colors.teal[600]!],
+                        colors: [
+                          Colors.teal[400]!, Colors.teal[600]!
+                          ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
