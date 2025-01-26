@@ -6,6 +6,7 @@ import 'package:go_parent/services/database/local/helpers/user_mission_helper.da
 import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
+import 'package:go_parent/utilities/constants.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -15,7 +16,7 @@ import 'package:go_parent/screens/mission_page/mission_brain.dart';
   Social,
   Creative,
   Physical,
-  Developmental,
+  Math,
 }
 
 
@@ -96,8 +97,6 @@ class _MissionScreenState extends State<MissionScreen> {
       // Fetch initial missions
       await _fetchMissions();
 
-
-
     } catch (e) {
       print('Error setting up dropdown: $e');
     } finally {
@@ -173,71 +172,110 @@ class _MissionScreenState extends State<MissionScreen> {
                       automaticallyImplyLeading: false,
                       backgroundColor: Colors.teal,
                       title: const Text('Go Missions', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
-                      bottom: const TabBar(
+
+                      bottom:  TabBar(
+
                         tabs: [
-                          Tab(text: 'All Missions', ),
+                          Tab(text: 'All Missions',  ),
                           // Tab(text: 'Social Missions', ),
                           // Tab(text: 'Creative Missions', ),
                           // Tab(text: 'Physical Missions', ),
-                        ],
-                        labelColor: Colors.white,
-                        unselectedLabelColor: Colors.white,
-                      ),
-                      actions: [
+                          // Tab(text: 'Math Missions'),
+                        ], labelColor: Colors.white,
+                            unselectedLabelColor: Colors.white,
+                            indicator: BoxDecoration(
+                            //  color: Colors.lightBlue,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            indicatorSize: TabBarIndicatorSize.tab,
+                            labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),),
 
+
+
+                      actions: [
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 12.0),
                           child: SizedBox(
-                            width: 200,
-                            child: DropdownButton<int>(
-                              dropdownColor: Colors.teal,
-                              value: _selectedBabyAge,
-                              items: dropdownItems
-                                  .map((item) => DropdownMenuItem<int>(
-                                        value: item.value,
-                                        child: Text(
-                                          item.label,
-                                          style: const TextStyle(color: Colors.white),
-                                        ),
-                                      ))
-                                  .toList(),
-                              onChanged: (int? age) async {
-                                setState(() {
-                                  _selectedBabyAge = age;
-
-                                  // Update the selected baby name
-                                  _selectedBabyName = dropdownItems
-                                      .firstWhere((item) => item.value == age)
-                                      .label;
-                                });
-                                await _fetchMissions();
-
-                                // Show RFlutter Alert
-                                final firstBabyName = _selectedBabyName;
-                                Alert(
-                                  context: context,
-                                  type: AlertType.success,
-                                  title: "Missions Loaded",
-                                  desc: "Loaded missions curated for baby $firstBabyName.",
-                                  buttons: [
-                                    DialogButton(
-                                      child: Text(
-                                        "OK",
-                                        style: TextStyle(color: Colors.white, fontSize: 18),
-                                      ),
-                                      onPressed: () => Navigator.pop(context),
-                                      width: 120,
-                                    )
-                                  ],
-                                ).show();
-
-                              },
-                              style: const TextStyle(color: Colors.white),
-                              iconEnabledColor: Colors.white,
+                            width: 250,
+                            child: Card(
+                              color: colorbeige,
+                              child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: Tooltip(
+                                  message: "Change Current Baby To Change Missions",
+                                  child: DropdownButton<int>(
+                                    dropdownColor: colorbeige,
+                                    value: _selectedBabyAge,
+                                    items: dropdownItems
+                                        .map((item) => DropdownMenuItem<int>(
+                                              value: item.value,
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      SizedBox(width: 4,),
+                                                      Icon(
+                                                        Icons.child_care,
+                                                        color: Colors.black,
+                                                        size: 20,
+                                                      ),
+                                                      SizedBox(width: 8),
+                                                      Text(
+                                                        item.label,
+                                                        style: const TextStyle(
+                                                          color: Colors.black,
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Icon(
+                                                    Icons.arrow_drop_down,
+                                                    color: Colors.black,
+                                                  ),
+                                                ],
+                                              ),
+                                            ))
+                                        .toList(),
+                                    onChanged: (int? age) async {
+                                      setState(() {
+                                        _selectedBabyAge = age;
+                                        _selectedBabyName = dropdownItems
+                                            .firstWhere((item) => item.value == age)
+                                            .label;
+                                      });
+                                      await _fetchMissions();
+                                      // Show RFlutter Alert
+                                      final firstBabyName = _selectedBabyName;
+                                      Alert(
+                                        context: context,
+                                        type: AlertType.success,
+                                        title: "Missions Loaded",
+                                        desc: "Loaded missions curated for baby $firstBabyName.",
+                                        buttons: [
+                                          DialogButton(
+                                            child: Text(
+                                              "OK",
+                                              style: TextStyle(color: Colors.white, fontSize: 18),
+                                            ),
+                                            onPressed: () => Navigator.pop(context),
+                                            width: 120,
+                                          )
+                                        ],
+                                      ).show();
+                                    },
+                                    style: const TextStyle(color: Colors.black),
+                                    iconEnabledColor: Colors.black,
+                                    isExpanded: true,
+                                    underline: SizedBox(),
+                                  ),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-
+                        )
 
                       ],
                     ),
@@ -248,103 +286,116 @@ class _MissionScreenState extends State<MissionScreen> {
                           Column(
                             children: [
 
+                              SizedBox(height: 30,),
+
 
                               Expanded(
-                                child: ListView.builder(
-                                    itemCount: _missions.length,
-                                    itemBuilder: (context, index) {
-                                      final missionWithStatus = _missions[index];
-                                      final mission = missionWithStatus.mission;
 
-                                      return Card(
-                                        elevation: 6,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        margin: const EdgeInsets.all(10.0),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(12.0),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.15),
+                                  child: ListView.builder(
+                                      itemCount: _missions.length,
+                                      itemBuilder: (context, index) {
+                                        final missionWithStatus = _missions[index];
+                                        final mission = missionWithStatus.mission;
 
-                                              ListTile(
-                                                title: Text(
-                                                  mission.title,
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
+                                        return Card(
 
-                                                subtitle: Text(
-                                                  mission.content,
-                                                  style: const TextStyle(
-                                                    color: Colors.black87,
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                                trailing: Icon(
-                                                  missionWithStatus.isCompleted
-                                                      ? Icons.check_circle
-                                                      : Icons.circle_outlined,
-                                                  color: missionWithStatus.isCompleted
-                                                      ? Colors.green
-                                                      : Colors.grey,
-                                                ),
-                                              ),
-
-                                              if (!missionWithStatus.isCompleted) ...[
-                                                const SizedBox(width: 10),
-                                                SizedBox(
-                                                  width: 180,
-                                                  child: ElevatedButton.icon(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.teal,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(10),
-                                                      ),
-                                                    ),
-                                                    onPressed: () async {
-                                                      if (mission.missionId != null) {
-                                                        await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
-                                                        await _fetchMissions();
-                                                      }
-                                                    },
-                                                    icon: const Icon(Icons.camera_alt, color: Colors.white),
-                                                    label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
-                                                  ),
-                                                )
-
-                                              ] else ...[
-                                                const SizedBox(width: 10),
-                                                SizedBox(
-                                                  width: 180,
-                                                  child: ElevatedButton.icon(
-                                                    style: ElevatedButton.styleFrom(
-                                                      backgroundColor: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius: BorderRadius.circular(10),
-                                                      ),
-                                                    ),
-                                                    onPressed: () async {
-                                                      if (mission.missionId != null) {
-                                                        await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
-                                                        await _fetchMissions();
-                                                      }
-                                                    },
-                                                    icon: const Icon(Icons.camera_alt, color: Colors.teal),
-                                                    label: const Text('Submit Another', style: TextStyle(color: Colors.teal)),
-                                                  ),
-                                                ),
-                                              ],
-
-                                            ],
+                                          elevation: 6,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(20),
                                           ),
-                                        ),
-                                      );
-                                    },
-                                  ),
+                                          margin: const EdgeInsets.all(10.0),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(12.0),
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              children: [
+
+                                                ListTile(
+                                                  title: Text(
+                                                    mission.title,
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+
+                                                  subtitle: Text(
+                                                    mission.content,
+                                                    style: const TextStyle(
+                                                      color: Colors.black87,
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  trailing: Tooltip(
+                                                    message: "Current Status of this Mission.",
+                                                    child: Icon(
+                                                      missionWithStatus.isCompleted
+                                                          ? Icons.check_circle
+                                                          : Icons.circle_outlined,
+                                                      color: missionWithStatus.isCompleted
+                                                          ? Colors.green
+                                                          : Colors.grey,
+                                                    ),
+                                                  ),
+                                                ),
+
+                                                if (!missionWithStatus.isCompleted) ...[
+                                                  const SizedBox(width: 10),
+                                                  SizedBox(
+                                                    width: 180,
+                                                    child: ElevatedButton.icon(
+                                                      style: ElevatedButton.styleFrom(
+                                                        backgroundColor: Colors.teal,
+                                                        shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(10),
+                                                        ),
+                                                      ),
+                                                      onPressed: () async {
+                                                        if (mission.missionId != null) {
+                                                          await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
+                                                          await _fetchMissions();
+                                                        }
+                                                      },
+                                                      icon: const Icon(Icons.camera_alt, color: Colors.white),
+                                                      label: const Text('Submit Photo', style: TextStyle(color: Colors.white)),
+                                                    ),
+                                                  )
+
+                                                ] else ...[
+                                                  const SizedBox(width: 10),
+                                                  SizedBox(
+                                                    width: 180,
+                                                    child: Tooltip(
+                                                      message: "You can submit another photo to further commemorate this mission!",
+                                                      child: ElevatedButton.icon(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(10),
+                                                          ),
+                                                        ),
+                                                        onPressed: () async {
+                                                          if (mission.missionId != null) {
+                                                            await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
+                                                            await _fetchMissions();
+                                                          }
+                                                        },
+                                                        icon: const Icon(Icons.camera_alt, color: Colors.teal),
+                                                        label: const Text('Submit Another', style: TextStyle(color: Colors.teal)),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+
+                                              ],
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                ),
                                 ),
 
                             ],

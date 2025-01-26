@@ -271,20 +271,20 @@ class _DashboardState extends State<Dashboard> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      actions: [
-        IconButton(
-          icon: const Icon(Icons.notifications_outlined, color: Colors.black87),
-          onPressed: ()  {
+      // actions: [
+      //   IconButton(
+      //     icon: const Icon(Icons.notifications_outlined, color: Colors.black87),
+      //     onPressed: ()  {
 
-            Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Childcare()),
-            );
+      //       Navigator.push(
+      //             context,
+      //             MaterialPageRoute(builder: (context) => Childcare()),
+      //       );
 
-          }
-        ),
-        const SizedBox(height: 15),
-      ],
+      //     }
+      // //   ),
+      //   const SizedBox(height: 15),
+      // ],
     ),
 
     body: isLoading
@@ -367,8 +367,9 @@ class _DashboardState extends State<Dashboard> {
                                       children: [
                                         TabBar(tabs:
                                         [
-                                          Tab(text: "My Recent Activities"),
-                                          Tab(text: "My Activity Analytics"),
+                                          Tooltip(
+                                            message:"Your Most Recent Activities!", child: Tab(text: "My Recent Activities")),
+                                          Tooltip(message: "Missions You've Been Most Engaged With!", child: Tab(text: "My Activity Analytics")),
                                         ], labelColor: Colors.white,
                                           unselectedLabelColor: Colors.black54,
                                           indicator: BoxDecoration(

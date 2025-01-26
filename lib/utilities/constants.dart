@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 const String kAppUsername = 'goparent.team@gmail.com';
 const String kAppPassword = 'lmqf hmpq viai pjbv ';
+Color colorbeige = Color(0xFFF2EFE7);
 
 
 String kHashPassword(String password) {

@@ -21,7 +21,7 @@ class GalleryScreen extends StatefulWidget {
   State<GalleryScreen> createState() => _GalleryScreenState();
 }
 
-class _GalleryScreenState extends State<GalleryScreen> {
+class _GalleryScreenState extends State<GalleryScreen> with SingleTickerProviderStateMixin {
   final userId = UserSession().userId;
   late final GalleryBrain galleryBrain;
   List<PictureModel> pictures = [];
@@ -31,12 +31,43 @@ class _GalleryScreenState extends State<GalleryScreen> {
   bool isSelectMode = false;
   Set<int> selectedPictureIds = {};
 
+
+void _animateFAB() {
+  _fabAnimationController = AnimationController(
+    duration: const Duration(milliseconds: 800),
+    vsync: this,
+  );
+
+  _fabAnimation = Tween<double>(begin: 1.0, end: 0.6).animate(
+    CurvedAnimation(
+      parent: _fabAnimationController,
+      curve: Curves.easeInOut,
+    ),
+  );
+
+  // Start the animation
+  _fabAnimationController.repeat(reverse: true);
+
+  // Stop the animation after a few seconds
+  Future.delayed(const Duration(seconds: 3), () {
+    _fabAnimationController.stop();
+    _fabAnimationController.value = 1.0;
+  });
+}
+
   @override
   void initState() {
     super.initState();
     _initializeGalleryBrain();
 
+    _animateFAB();
+
   }
+
+
+
+
+
 
   Future<void> _initializeGalleryBrain() async {
     sqfliteFfiInit();
@@ -70,6 +101,11 @@ class _GalleryScreenState extends State<GalleryScreen> {
     if (date == null) return 'No date';
     return DateFormat('MMM d, y').format(date);
   }
+
+
+
+
+
 
 @override
 Widget build(BuildContext context) {
@@ -251,78 +287,81 @@ Widget build(BuildContext context) {
                         );
                       },
                     ),
-                    Positioned(
-                      right: 32,
-                      bottom: 32,
-                      child: Tooltip(
-                        message: isSelectMode ? "Continue" : "Create Collage",
-                        child: FloatingActionButton(
-                          backgroundColor: Colors.teal,
-                          onPressed: () {
-                            if (isSelectMode) {
-                              if (selectedPictureIds.isEmpty) {
-                                Alert(
-                                  context: context,
-                                  type: AlertType.warning,
-                                  title: "No Pictures Selected",
-                                  desc: "Please select at least two pictures to create a collage.",
-                                  buttons: [
-                                    DialogButton(
-                                      child: const Text(
-                                        "OK",
-                                        style: TextStyle(color: Colors.white, fontSize: 20),
+                    ScaleTransition(
+                      scale: _fabAnimation,
+                      child: Positioned(
+                        right: 32,
+                        bottom: 32,
+                        child: Tooltip(
+                          message: isSelectMode ? "Continue" : "Create Collage",
+                          child: FloatingActionButton(
+                            backgroundColor: Colors.teal,
+                            onPressed: () {
+                              if (isSelectMode) {
+                                if (selectedPictureIds.isEmpty) {
+                                  Alert(
+                                    context: context,
+                                    type: AlertType.warning,
+                                    title: "No Pictures Selected",
+                                    desc: "Please select at least two pictures to create a collage.",
+                                    buttons: [
+                                      DialogButton(
+                                        child: const Text(
+                                          "OK",
+                                          style: TextStyle(color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: () => Navigator.pop(context),
+                                        color: Colors.teal,
                                       ),
-                                      onPressed: () => Navigator.pop(context),
-                                      color: Colors.teal,
-                                    ),
-                                  ],
-                                ).show();
-                              } else if (selectedPictureIds.length < 2) {
-                                Alert(
-                                  context: context,
-                                  type: AlertType.warning,
-                                  title: "Not Enough Pictures",
-                                  desc: "You need at least two pictures to create a collage.",
-                                  buttons: [
-                                    DialogButton(
-                                      child: const Text(
-                                        "OK",
-                                        style: TextStyle(color: Colors.white, fontSize: 20),
+                                    ],
+                                  ).show();
+                                } else if (selectedPictureIds.length < 2) {
+                                  Alert(
+                                    context: context,
+                                    type: AlertType.warning,
+                                    title: "Not Enough Pictures",
+                                    desc: "You need at least two pictures to create a collage.",
+                                    buttons: [
+                                      DialogButton(
+                                        child: const Text(
+                                          "OK",
+                                          style: TextStyle(color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: () => Navigator.pop(context),
+                                        color: Colors.teal,
                                       ),
-                                      onPressed: () => Navigator.pop(context),
-                                      color: Colors.teal,
+                                    ],
+                                  ).show();
+                                } else {
+                                  List<PictureModel> selectedPictures = pictures
+                                      .where((picture) => selectedPictureIds.contains(picture.pictureId))
+                                      .toList();
+
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => CollageCreator(
+                                        selectedPictures: selectedPictures,
+                                      ),
                                     ),
-                                  ],
-                                ).show();
+                                  );
+
+                                  setState(() {
+                                    isSelectMode = false;
+                                    selectedPictureIds.clear();
+                                  });
+                                }
                               } else {
-                                List<PictureModel> selectedPictures = pictures
-                                    .where((picture) => selectedPictureIds.contains(picture.pictureId))
-                                    .toList();
-
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => CollageCreator(
-                                      selectedPictures: selectedPictures,
-                                    ),
-                                  ),
-                                );
-
                                 setState(() {
-                                  isSelectMode = false;
-                                  selectedPictureIds.clear();
+                                  isSelectMode = true;
                                 });
                               }
-                            } else {
-                              setState(() {
-                                isSelectMode = true;
-                              });
-                            }
-                          },
+                            },
 
-                          child: Icon(
-                            isSelectMode ? Icons.check : Icons.add,
-                            color: Colors.white,
+                            child: Icon(
+                              isSelectMode ? Icons.check : Icons.add,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),
@@ -392,4 +431,17 @@ Widget build(BuildContext context) {
       ),
     );
   }
+
+  // And in dispose
+late AnimationController _fabAnimationController;
+late Animation<double> _fabAnimation;
+
+// And in dispose
+@override
+void dispose() {
+  _fabAnimationController.dispose();
+  super.dispose();
+}
+
+
 }
