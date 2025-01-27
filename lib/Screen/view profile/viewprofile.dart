@@ -2,8 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:go_parent/Screen/view%20profile/addBabyScreen.dart';
+import 'package:go_parent/Screen/view%20profile/emergency_hotline_screen.dart';
 import 'package:go_parent/Screen/view%20profile/profile_viewer_editor.dart';
 import 'package:go_parent/Screen/view%20profile/updateBabyInfo.dart';
+import 'package:go_parent/Screen/view%20profile/update_profile_info.dart';
 import 'package:go_parent/screens/profile_page/profile_brain.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/user_helper.dart';
@@ -28,10 +30,13 @@ class _profileviewerState extends State<profileviewer> {
   late UserSession userSession;
   List<BabyModel> babies = [];
   Color colorbeige = Color(0xFFF2EFE7);
+  String familyAddress = 'click to update';
+  String emergencyContact = 'click to update';
+  String familyDoctor = 'cick to update';
+  String school = 'click to update';
 
   @override
   void initState() {
-
     super.initState();
     userSession = UserSession();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -41,7 +46,7 @@ class _profileviewerState extends State<profileviewer> {
     });
   }
 
-    void initProfileBrain () async {
+  void initProfileBrain() async {
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
 
@@ -54,10 +59,8 @@ class _profileviewerState extends State<profileviewer> {
     profileBrain = ProfileBrain(userHelper, babyHelper);
   }
 
-
   void initializeDatabase() async {
-    final database =
-        await openDatabase('goparent_v6.db');
+    final database = await openDatabase('goparent_v6.db');
     setState(() {
       _babyHelper = BabyHelper(database);
     });
@@ -110,97 +113,136 @@ class _profileviewerState extends State<profileviewer> {
   }
 
   Widget _buildChildCard({
-  required String name,
-  required String age,
-  required int index,
-}) {
-  return Container(
-    width: 120,
-    margin: const EdgeInsets.only(right: 16),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(12),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.grey.withOpacity(0.2),
-          spreadRadius: 1,
-          blurRadius: 5,
-          offset: Offset(0, 3),
-        ),
-      ],
-    ),
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(height: 16),
-        Stack(
-          children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: colorbeige,
-                  width: 3,
-                ),
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.child_care,
-                  size: 50,
-                  color: Colors.teal[200],
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.all(4),
+    required String name,
+    required String age,
+    required int index,
+  }) {
+    return Container(
+      width: 120,
+      margin: const EdgeInsets.only(right: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 1,
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(height: 16),
+          Stack(
+            children: [
+              Container(
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
-                  color: Colors.teal,
                   shape: BoxShape.circle,
+                  border: Border.all(
+                    color: colorbeige,
+                    width: 3,
+                  ),
                 ),
-                child: Text(
-                  '$index',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                child: Center(
+                  child: Icon(
+                    Icons.child_care,
+                    size: 50,
+                    color: Colors.teal[200],
                   ),
                 ),
               ),
+              Positioned(
+                bottom: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.teal,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Text(
+                    '$index',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            name,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF2E3E5C),
             ),
-          ],
-        ),
-        SizedBox(height: 8),
-        Text(
-          name,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF2E3E5C),
           ),
-        ),
-        Text(
-          age,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey,
+          Text(
+            age,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
           ),
+          SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToEditScreen({
+    required BuildContext context,
+    required String title,
+    required String currentValue,
+    required ValueChanged<String> onSave,
+  }) async {
+    final updatedValue = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditInfoScreen(
+          title: title,
+          initialValue: currentValue,
         ),
-        SizedBox(height: 16),
-      ],
-    ),
-  );
-}
+      ),
+    );
+
+    if (updatedValue != null && updatedValue is String) {
+      setState(() {
+        switch (title) {
+          case 'Family Address':
+            familyAddress = updatedValue;
+            break;
+          case 'Emergency Contact':
+            emergencyContact = updatedValue;
+            break;
+          case 'Family Doctor':
+            familyDoctor = updatedValue;
+            break;
+          case 'School':
+            school = updatedValue;
+            break;
+        }
+      });
+      onSave(updatedValue);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('$title updated successfully!')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
     final bool isSmallScreen = screenSize.width < 600;
-
 
     return Scaffold(
       backgroundColor: Color(0xFFF5F8FF),
@@ -233,12 +275,9 @@ class _profileviewerState extends State<profileviewer> {
         //   ),
         // ],
       ),
-
-
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             // Parent Profile Section
             Container(
               margin: EdgeInsets.symmetric(horizontal: 32),
@@ -257,7 +296,6 @@ class _profileviewerState extends State<profileviewer> {
                   ),
                 ],
               ),
-
               child: Column(
                 children: [
                   SizedBox(height: 10),
@@ -301,7 +339,6 @@ class _profileviewerState extends State<profileviewer> {
                       color: colorbeige,
                       borderRadius: BorderRadius.circular(20),
                     ),
-
                     child: Text(
                       'Loving Parent',
                       style: TextStyle(
@@ -333,13 +370,13 @@ class _profileviewerState extends State<profileviewer> {
                   ),
                   SizedBox(height: 16),
 
-
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child:  Row(
+                    child: Row(
                       children: [
                         ...babies.asMap().entries.map((entry) {
-                          final index = entry.key + 1; // Adding 1 to start from 1 instead of 0
+                          final index = entry.key +
+                              1; // Adding 1 to start from 1 instead of 0
                           final baby = entry.value;
                           return Tooltip(
                             message: "Edit Baby Information",
@@ -347,7 +384,8 @@ class _profileviewerState extends State<profileviewer> {
                               onTap: () async {
                                 final babyId = baby.babyId;
                                 if (babyId != null) {
-                                  final babyDetails = await _babyHelper?.getBabyById(babyId);
+                                  final babyDetails =
+                                      await _babyHelper?.getBabyById(babyId);
                                   if (babyDetails != null) {
                                     Navigator.push(
                                       context,
@@ -362,23 +400,21 @@ class _profileviewerState extends State<profileviewer> {
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Could not find baby details'),
+                                      content:
+                                          Text('Could not find baby details'),
                                       backgroundColor: Colors.red,
                                     ),
                                   );
                                 }
                               },
-
                               child: _buildChildCard(
                                 name: baby.babyName ?? 'Unnamed',
                                 age: baby.babyGender ?? 'N/A',
                                 index: index,
                               ),
-                                  ),
-                          );}
-                        ),
-
-
+                            ),
+                          );
+                        }),
                         Container(
                           width: 120,
                           margin: const EdgeInsets.only(right: 16),
@@ -403,8 +439,6 @@ class _profileviewerState extends State<profileviewer> {
                                     const BorderSide(color: Color(0xFF4B8EFF)),
                               ),
                             ),
-
-
                             child: const Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
@@ -420,31 +454,33 @@ class _profileviewerState extends State<profileviewer> {
                   ),
                   SizedBox(height: 24),
 
-
-
                   // Family Information Cards
                   _buildFamilyInfoCard(
                     icon: Icons.home,
                     title: 'Family Address',
-                    value: '123 Family Street, Happy Valley',
+                    value: familyAddress,
+                    onTap: () {},
                   ),
                   SizedBox(height: 16),
                   _buildFamilyInfoCard(
                     icon: Icons.phone,
                     title: 'Emergency Contact',
-                    value: '+1 234 567 890',
+                    value: emergencyContact,
+                    onTap: () {},
                   ),
                   SizedBox(height: 16),
                   _buildFamilyInfoCard(
                     icon: Icons.local_hospital,
                     title: 'Family Doctor',
-                    value: 'Dr. Smith | Pediatric Care',
+                    value: familyDoctor,
+                    onTap: () {},
                   ),
                   SizedBox(height: 16),
                   _buildFamilyInfoCard(
                     icon: Icons.school,
                     title: 'School',
-                    value: 'Sunshine Elementary',
+                    value: school,
+                    onTap: () {},
                   ),
 
                   SizedBox(height: 24),
@@ -478,17 +514,24 @@ class _profileviewerState extends State<profileviewer> {
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             _buildQuickActionButton(
-                              icon: Icons.calendar_today,
-                              label: 'Schedule',
-                            ),
+                                icon: Icons.emergency,
+                                label: 'Emergency Hotline',
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            EmergencyHotlineScreen()),
+                                  );
+                                }),
                             _buildQuickActionButton(
-                              icon: Icons.medical_information,
-                              label: 'Health Records',
-                            ),
+                                icon: Icons.medical_information,
+                                label: 'Health Records',
+                                onTap: () {}),
                             _buildQuickActionButton(
-                              icon: Icons.photo_library,
-                              label: 'Memories',
-                            ),
+                                icon: Icons.photo_library,
+                                label: 'Memories',
+                                onTap: () {}),
                           ],
                         ),
                       ],
@@ -565,59 +608,72 @@ class _profileviewerState extends State<profileviewer> {
     required IconData icon,
     required String title,
     required String value,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 10,
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Color(0xFF4B8EFF).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: () {
+        _navigateToEditScreen(
+          context: context,
+          title: title,
+          currentValue: value,
+          onSave: (newValue) {
+            // The setState is now handled in _navigateToEditScreen
+          },
+        );
+      },
+      child: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 10,
             ),
-            child: Icon(
-              icon,
-              color: Color(0xFF4B8EFF),
-              size: 24,
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Color(0xFF4B8EFF).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: Color(0xFF4B8EFF),
+                size: 24,
+              ),
             ),
-          ),
-          SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    color: Colors.grey[600],
-                    fontSize: 14,
+            SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
                   ),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF2E3E5C),
+                  SizedBox(height: 4),
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2E3E5C),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -625,30 +681,34 @@ class _profileviewerState extends State<profileviewer> {
   Widget _buildQuickActionButton({
     required IconData icon,
     required String label,
+    required VoidCallback onTap,
   }) {
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Color(0xFF4B8EFF).withOpacity(0.1),
-            shape: BoxShape.circle,
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Color(0xFF4B8EFF).withOpacity(0.1),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              color: Color(0xFF4B8EFF),
+              size: 24,
+            ),
           ),
-          child: Icon(
-            icon,
-            color: Color(0xFF4B8EFF),
-            size: 24,
+          SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Color(0xFF2E3E5C),
+            ),
           ),
-        ),
-        SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Color(0xFF2E3E5C),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
