@@ -174,19 +174,24 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> handleLogout(BuildContext context) async {
   try {
+    setState(() => isLoading = true);
+
     // 1. Clear the UserSession singleton
     UserSession().clearUser();
 
     // 2. Clear any stored credentials/tokens
     final prefs = await SharedPreferences.getInstance();
-    await prefs.clear(); // Clear all stored preferences
+    await prefs.clear();
 
+    // Stop loading before showing alert
+    setState(() => isLoading = false);
     // Show success alert
     Alert(
       context: context,
       type: AlertType.success,
       title: "Logout Successful",
       desc: "You have been successfully logged out.",
+      // closeIcon: false,
       buttons: [
         DialogButton(
           child: const Text(
@@ -204,7 +209,7 @@ class _DashboardState extends State<Dashboard> {
               (Route<dynamic> route) => false, // Remove all previous routes
             );
           },
-          color: Colors.green,
+          color: Colors.teal,
         )
       ],
     ).show();
@@ -292,7 +297,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
 
     bool isHovered = false;
-  
+
 
 
 
@@ -321,7 +326,6 @@ class _DashboardState extends State<Dashboard> {
       return Container();
     }
 
-
   return Scaffold(
     backgroundColor: Colors.grey[100],
     appBar: AppBar(
@@ -343,18 +347,31 @@ class _DashboardState extends State<Dashboard> {
           onEnter: (_) => setState(() => isHovered = true),
           onExit: (_) => setState(() => isHovered = false),
           child: GestureDetector(
-            onTap: //handleLogout,
-            print("wawa"),
-            child: Text(
-              'Logout',
-              style: TextStyle(
-                decoration: isHovered ? TextDecoration.underline : null,
-                color: Colors.blue,
-                fontSize: 16,
-              ),
+            onTap: () async {handleLogout(context);} ,
+
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.logout,
+                  color: Colors.teal,
+                  size: 20,
+                ),
+                SizedBox(width: 8), // spacing between icon and text
+                Text(
+                  'Logout',
+                  style: TextStyle(
+                    decoration: isHovered ? TextDecoration.underline : null,
+                    color: Colors.teal,
+                    fontSize: 16, fontWeight: FontWeight.bold
+                  ),
+                ),
+                SizedBox(width: 20,)
+              ],
             ),
           ),
         ),
+
 
 
       //   IconButton(

@@ -35,6 +35,10 @@ class _profileviewerState extends State<profileviewer> {
   String familyDoctor = 'cick to update';
   String school = 'click to update';
 
+  String username = "";
+   bool isLoading = true;
+  final _userid = UserSession().userId;
+
   @override
   void initState() {
     super.initState();
@@ -57,6 +61,8 @@ class _profileviewerState extends State<profileviewer> {
     final userHelper = UserHelper(db);
 
     profileBrain = ProfileBrain(userHelper, babyHelper);
+
+    _loadUserData();
   }
 
   void initializeDatabase() async {
@@ -86,6 +92,23 @@ class _profileviewerState extends State<profileviewer> {
         babies = fetchedBabies
             .where((baby) => baby.babyName?.isNotEmpty == true)
             .toList();
+      });
+    }
+  }
+
+
+  Future<void> _loadUserData() async {
+    final user = await profileBrain.userHelper.getUserById(_userid!);
+
+    if (user != null) {
+      setState(() {
+        username = user.username.toUpperCase();
+        //isLoading = false;
+      });
+    } else {
+      setState(() {
+        username = "erruser";
+      //  isLoading = false;
       });
     }
   }
@@ -323,7 +346,7 @@ class _profileviewerState extends State<profileviewer> {
                   SizedBox(height: 8),
 
                   Text(
-                    'Hero',
+                    '${username}',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
