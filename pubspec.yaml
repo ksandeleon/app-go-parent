@@ -36,6 +36,7 @@ dependencies:
   path_provider: ^2.1.5
   share_plus: ^10.1.4
   carousel_slider: ^5.0.0
+  shared_preferences: ^2.4.0
 
 dev_dependencies:
   flutter_test:

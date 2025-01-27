@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:go_parent/Screen/childcare.dart';
 import 'package:go_parent/screens/home_page/dashboard_brain.dart';
+import 'package:go_parent/screens/login_page/login_screen.dart';
 import 'package:go_parent/services/database/local/helpers/baby_helper.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
 import 'package:go_parent/services/database/local/helpers/user_helper.dart';
@@ -11,6 +12,7 @@ import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/services/database/local/models/user_mission_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/user_session.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:intl/intl.dart';
@@ -170,34 +172,64 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  Future<void> handleLogout(BuildContext context) async {
+  try {
+    // 1. Clear the UserSession singleton
+    UserSession().clearUser();
 
-  @override
-  Widget build(BuildContext context) {
+    // 2. Clear any stored credentials/tokens
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear(); // Clear all stored preferences
 
-    if (_userid == null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Alert(
-          context: context,
-          type: AlertType.error,
-          title: "Login Failed",
-          desc: "Please log in again to continue.",
-          buttons: [
-            DialogButton(
-              child: Text(
-                "OK",
-                style: TextStyle(color: Colors.white, fontSize: 18),
+    // Show success alert
+    Alert(
+      context: context,
+      type: AlertType.success,
+      title: "Logout Successful",
+      desc: "You have been successfully logged out.",
+      buttons: [
+        DialogButton(
+          child: const Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            // 4. Clear navigation stack and redirect to login
+            // This ensures user can't go back to authenticated pages
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(
+                builder: (context) => const LoginPage1(),
               ),
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.pushReplacementNamed(context, "login_screen");
-              },
-              width: 120,
-            )
-          ],
-        ).show();
-      });
-      return Container();
-    }
+              (Route<dynamic> route) => false, // Remove all previous routes
+            );
+          },
+          color: Colors.green,
+        )
+      ],
+    ).show();
+
+  } catch (e) {
+    // Handle any errors during logout
+    print('Error during logout: $e');
+    Alert(
+      context: context,
+      type: AlertType.error,
+      title: "Logout Error",
+      desc: "An error occurred during logout.",
+      buttons: [
+        DialogButton(
+          child: const Text(
+            "OK",
+            style: TextStyle(color: Colors.white, fontSize: 18),
+          ),
+          onPressed: () => Navigator.pop(context),
+          color: Colors.red,
+        )
+      ],
+    ).show();
+  }
+}
 
 
   void _showCategoryDetails(BuildContext context, Map<String, dynamic> category) {
@@ -256,6 +288,39 @@ class _DashboardState extends State<Dashboard> {
   }
 
 
+  @override
+  Widget build(BuildContext context) {
+
+    bool isHovered = false;
+  
+
+
+
+    if (_userid == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Alert(
+          context: context,
+          type: AlertType.error,
+          title: "Login Failed",
+          desc: "Please log in again to continue.",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "OK",
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.pushReplacementNamed(context, "login_screen");
+              },
+              width: 120,
+            )
+          ],
+        ).show();
+      });
+      return Container();
+    }
+
 
   return Scaffold(
     backgroundColor: Colors.grey[100],
@@ -271,7 +336,27 @@ class _DashboardState extends State<Dashboard> {
           fontWeight: FontWeight.bold,
         ),
       ),
-      // actions: [
+      actions: [
+
+
+        MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: GestureDetector(
+            onTap: //handleLogout,
+            print("wawa"),
+            child: Text(
+              'Logout',
+              style: TextStyle(
+                decoration: isHovered ? TextDecoration.underline : null,
+                color: Colors.blue,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        ),
+
+
       //   IconButton(
       //     icon: const Icon(Icons.notifications_outlined, color: Colors.black87),
       //     onPressed: ()  {
@@ -283,8 +368,8 @@ class _DashboardState extends State<Dashboard> {
 
       //     }
       // //   ),
-      //   const SizedBox(height: 15),
-      // ],
+        const SizedBox(height: 15),
+      ],
     ),
 
     body: isLoading
