@@ -5,6 +5,7 @@ import 'package:go_parent/screens/gallery_page/collage_screen.dart';
 import 'package:go_parent/services/database/local/helpers/collage_helper.dart';
 import 'package:go_parent/services/database/local/helpers/collage_pictures_helper.dart';
 import 'package:go_parent/utilities/constants.dart';
+import 'package:go_parent/utilities/mission_report.dart';
 import 'package:intl/intl.dart';
 import 'package:go_parent/screens/gallery_page/gallery_brain.dart';
 import 'package:go_parent/services/database/local/helpers/pictures_helper.dart';
@@ -220,7 +221,7 @@ Widget build(BuildContext context) {
                                       ),
                                     ),
 
-                                    // ... rest of your image details ...
+                                    MissionReportDisplay(index: index),
 
                                   ],
                                 ),
@@ -390,6 +391,64 @@ Widget build(BuildContext context) {
                 ],
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+
+
+
+
+
+class MissionReportDisplay extends StatelessWidget {
+  final int index;  // Add index parameter
+
+  const MissionReportDisplay({
+    super.key,
+    required this.index,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final reports = MissionReport.instance.getReports();
+
+    // Only show report if we have a report at this index
+    if (reports.isEmpty || index >= reports.length) {
+      return const SizedBox.shrink();
+    }
+
+    // Get the specific report for this index
+    final report = reports[index];
+
+    return Container(
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.teal.withOpacity(0.1),
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(8.0),
+          bottomRight: Radius.circular(8.0),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            'Mission Interaction:',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 12,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            report,
+            style: const TextStyle(fontSize: 11),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

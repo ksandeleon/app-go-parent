@@ -7,6 +7,7 @@ import 'package:go_parent/services/database/local/models/baby_model.dart';
 import 'package:go_parent/services/database/local/models/missions_model.dart';
 import 'package:go_parent/services/database/local/sqlite.dart';
 import 'package:go_parent/utilities/constants.dart';
+import 'package:go_parent/utilities/mission_report.dart';
 import 'package:go_parent/utilities/user_session.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
@@ -151,6 +152,46 @@ class _MissionScreenState extends State<MissionScreen> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+
+
+  //pinapaadd ni maam
+
+  final TextEditingController _missionController = TextEditingController();
+
+  void _showOptionDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Mission Report'),
+          content: TextField(
+            controller: _missionController,
+            decoration: InputDecoration(
+              hintText: 'Any place, song, video, call, tool, or person...',
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Submit'),
+              onPressed: () {
+                // Save the mission report
+                MissionReport.instance.addReport(_missionController.text);
+                _missionController.clear();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
 
@@ -354,7 +395,15 @@ class _MissionScreenState extends State<MissionScreen> {
                                                       ),
                                                       onPressed: () async {
                                                         if (mission.missionId != null) {
+                                                           _showOptionDialog();
+
+                                                           
                                                           await _missionBrain.completeMissionWithPhoto(context, mission.missionId!);
+
+
+
+
+
                                                           await _fetchMissions();
                                                         }
                                                       },
@@ -414,6 +463,8 @@ class _MissionScreenState extends State<MissionScreen> {
     );
   }
 }
+
+
 class MissionWithStatus {
   final MissionModel mission;
   bool isCompleted;
